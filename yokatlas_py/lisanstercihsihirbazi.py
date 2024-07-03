@@ -43,7 +43,7 @@ class YOKATLASLisansTercihSihirbazi:
 
     def search(self):
         payload = urlencode(self.columns)
-        print("Payload:", payload)  # Print the payload to the console
+
 
         response = requests.post(
             "https://yokatlas.yok.gov.tr/server_side/server_processing-atlas2016-TS-t4.php",
@@ -51,7 +51,7 @@ class YOKATLASLisansTercihSihirbazi:
             headers={"Content-Type": "application/x-www-form-urlencoded; charset=UTF-8"},
             verify=False
         )
-        print(response.text)
+
         if response.status_code == 200:
             return parse_lisans_results(response.json())
         else:
