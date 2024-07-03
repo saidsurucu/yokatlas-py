@@ -1,13 +1,16 @@
 import json
 from bs4 import BeautifulSoup
 from urllib.parse import parse_qsl
+from pkg_resources import resource_filename
 
 def load_column_data():
-    with open("columnData.json", "r") as file:
+    json_path = resource_filename(__name__, 'columnData.json')
+    with open(json_path, 'r') as file:
         column_data = json.load(file)
         if isinstance(column_data, list) and len(column_data) > 0:
             return dict(parse_qsl(column_data[0]))
     return {}
+
 
 def extract_text_from_html(html):
     if not html:
