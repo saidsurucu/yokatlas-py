@@ -2,7 +2,7 @@ from setuptools import setup, find_packages
 
 setup(
     name="yokatlas-py",
-    version="0.1.1",
+    version="0.1.2",
     author="Said Sürücü",
     author_email="saidsrc@gmail.com",
     description="A python wrapper for YOKATLAS API",
@@ -10,6 +10,9 @@ setup(
     long_description_content_type="text/markdown",
     url="https://github.com/saidsurucu/yokatlas-py",  # Update with your repository URL
     packages=find_packages(include=['yokatlas_py', 'yokatlas_py.*']),
+    package_data={
+        'yokatlas_py': ['columnData.json'],
+    },
     install_requires=[
         "requests",
         "urllib3",
