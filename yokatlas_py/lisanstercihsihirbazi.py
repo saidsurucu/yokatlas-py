@@ -1,6 +1,6 @@
 import requests
 from urllib.parse import urlencode
-from utils import load_column_data, parse_lisans_results
+from .utils import load_column_data, parse_lisans_results
 import urllib3
 
 urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)

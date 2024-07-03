@@ -2,7 +2,7 @@ from setuptools import setup, find_packages
 
 setup(
     name="yokatlas-py",
-    version="0.1.0",
+    version="0.1.1",
     author="Said Sürücü",
     author_email="saidsrc@gmail.com",
     description="A python wrapper for YOKATLAS API",
@@ -11,10 +11,7 @@ setup(
     url="https://github.com/saidsurucu/yokatlas-py",  # Update with your repository URL
     packages=find_packages(include=['yokatlas_py', 'yokatlas_py.*']),
     install_requires=[
-        "fastapi",
-        "pydantic",
         "requests",
-        "uvicorn",
         "urllib3",
         "aiohttp"   
     ],

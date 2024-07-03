@@ -1,33 +1,36 @@
 import asyncio
-from lisans_fetchers.genel_bilgiler import fetch_genel_bilgiler
-from lisans_fetchers.kontenjan_yerlesme import fetch_kontenjan_yerlesme
-from lisans_fetchers.cinsiyet_dagilimi import fetch_cinsiyet_dagilimi
-from lisans_fetchers.sehir_ve_cografi_bolge_dagilimi import fetch_sehir_ve_cografi_bolge_dagilimi
-from lisans_fetchers.yerlesen_il_dagilimi import fetch_yerlesen_il_dagilimi
-from lisans_fetchers.ogrenim_durumu import fetch_ogrenim_durumu
-from lisans_fetchers.mezuniyet_yili_dagilimi import fetch_mezuniyet_yili_dagilimi
-from lisans_fetchers.lise_alani_dagilimi import fetch_lise_alani_dagilimi
-from lisans_fetchers.lise_grubu_ve_tipi_dagilimi import fetch_lise_grubu_ve_tipi_dagilimi
-from lisans_fetchers.lise_bazinda_yerlesen_dagilimi import fetch_lise_bazinda_yerlesen_dagilimi
-from lisans_fetchers.okul_birincisi_yerlesen import fetch_okul_birincisi_yerlesen
-from lisans_fetchers.taban_puan_ve_basari_sirasi_istatistikleri import fetch_taban_puan_ve_basari_sirasi_istatistikleri
-from lisans_fetchers.yerlesen_son_kisi_bilgileri import fetch_yerlesen_son_kisi_bilgileri
-from lisans_fetchers.yerlesen_ortalama_netler import fetch_yerlesen_ortalama_netler
-from lisans_fetchers.yerlesen_puan_bilgileri import fetch_yerlesen_puan_bilgileri
-from lisans_fetchers.yerlesen_basari_siralari import fetch_yerlesen_basari_siralari
-from lisans_fetchers.tercih_istatistikleri import fetch_tercih_istatistikleri
-from lisans_fetchers.yerlesen_tercih_istatistikleri import fetch_yerlesen_tercih_istatistikleri
-from lisans_fetchers.tercih_kullanma_oranlari import fetch_tercih_kullanma_oranlari
-from lisans_fetchers.tercih_edilen_universite_turleri import fetch_tercih_edilen_universite_turleri
-from lisans_fetchers.tercih_edilen_universiteler import fetch_tercih_edilen_universiteler
-from lisans_fetchers.tercih_edilen_iller import fetch_tercih_edilen_iller
-from lisans_fetchers.tercih_edilen_program_turleri import fetch_tercih_edilen_program_turleri
-from lisans_fetchers.tercih_edilen_programlar import fetch_tercih_edilen_programlar
-from lisans_fetchers.akademisyen_sayilari import fetch_akademisyen_sayilari
-from lisans_fetchers.kayitli_ogrenci_cinsiyet_dagilimi import fetch_kayitli_ogrenci_cinsiyet_dagilimi
-from lisans_fetchers.mezuniyet_yili_cinsiyet_dagilimi import fetch_mezuniyet_yili_cinsiyet_dagilimi
-from lisans_fetchers.degisim_programi_bilgileri import fetch_degisim_programi_bilgileri
-from lisans_fetchers.yatay_gecis_bilgileri import fetch_yatay_gecis_bilgileri
+from .lisans_fetchers import (
+    fetch_genel_bilgiler,
+    fetch_kontenjan_yerlesme,
+    fetch_cinsiyet_dagilimi,
+    fetch_sehir_ve_cografi_bolge_dagilimi,
+    fetch_yerlesen_il_dagilimi,
+    fetch_ogrenim_durumu,
+    fetch_mezuniyet_yili_dagilimi,
+    fetch_lise_alani_dagilimi,
+    fetch_lise_grubu_ve_tipi_dagilimi,
+    fetch_lise_bazinda_yerlesen_dagilimi,
+    fetch_okul_birincisi_yerlesen,
+    fetch_taban_puan_ve_basari_sirasi_istatistikleri,
+    fetch_yerlesen_son_kisi_bilgileri,
+    fetch_yerlesen_ortalama_netler,
+    fetch_yerlesen_puan_bilgileri,
+    fetch_yerlesen_basari_siralari,
+    fetch_tercih_istatistikleri,
+    fetch_yerlesen_tercih_istatistikleri,
+    fetch_tercih_kullanma_oranlari,
+    fetch_tercih_edilen_universite_turleri,
+    fetch_tercih_edilen_universiteler,
+    fetch_tercih_edilen_iller,
+    fetch_tercih_edilen_program_turleri,
+    fetch_tercih_edilen_programlar,
+    fetch_akademisyen_sayilari,
+    fetch_kayitli_ogrenci_cinsiyet_dagilimi,
+    fetch_mezuniyet_yili_cinsiyet_dagilimi,
+    fetch_degisim_programi_bilgileri,
+    fetch_yatay_gecis_bilgileri
+)
+
 
 class YOKATLASLisansAtlasi:
     def __init__(self, params, keys='all'):
