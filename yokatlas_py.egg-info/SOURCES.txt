@@ -1,0 +1,14 @@
+LICENSE
+README.md
+setup.py
+yokatlas_py/__init__.py
+yokatlas_py/lisansatlasi.py
+yokatlas_py/lisanstercihsihirbazi.py
+yokatlas_py/onlisansatlasi.py
+yokatlas_py/onlisanstercihsihirbazi.py
+yokatlas_py/utils.py
+yokatlas_py.egg-info/PKG-INFO
+yokatlas_py.egg-info/SOURCES.txt
+yokatlas_py.egg-info/dependency_links.txt
+yokatlas_py.egg-info/requires.txt
+yokatlas_py.egg-info/top_level.txt
