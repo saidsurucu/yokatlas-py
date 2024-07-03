@@ -2,7 +2,7 @@ from setuptools import setup, find_packages
 
 setup(
     name="yokatlas-py",
-    version="0.1.6",
+    version="0.1.7",
     author="Said Sürücü",
     author_email="saidsrc@gmail.com",
     description="A python wrapper for YOKATLAS API",
