@@ -49,7 +49,6 @@ class YOKATLASOnlisansTercihSihirbazi:
 
     def search(self):
         payload = urlencode(self.columns)
-        print("Payload:", payload)  # Print the payload to the console
 
         response = requests.post(
             "https://yokatlas.yok.gov.tr/server_side/server_processing-atlas2016-TS-t3.php",
