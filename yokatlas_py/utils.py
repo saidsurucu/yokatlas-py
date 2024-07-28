@@ -63,20 +63,20 @@ def parse_onlisans_item(item):
         "ucret_burs": clean_text(get_value(8)),
         "ogretim_turu": clean_text(get_value(9)),
         "kontenjan": {
-            "2023": get_value(10, color='red'),
-            "2022": get_value(10, color='blue')
+            "2024": get_value(10, color='red'),
+            "2023": get_value(10, color='blue')
         },
         "yerlesen": {
-            "2023": get_value(16, color='red'),
-            "2022": get_value(16, color='blue')
+            "2024": get_value(16, color='red'),
+            "2023": get_value(16, color='blue')
         },
         "taban": {
-            "2023": format_taban(get_value(21, color='red')),
-            "2022": format_taban(get_value(21, color='blue'))
+            "2024": format_taban(get_value(21, color='red')),
+            "2023": format_taban(get_value(21, color='blue'))
         },
         "tbs": {
-            "2023": format_tbs(get_value(22, color='red')),
-            "2022": format_tbs(get_value(22, color='blue'))
+            "2024": format_tbs(get_value(22, color='red')),
+            "2023": format_tbs(get_value(22, color='blue'))
         }
     }
 
@@ -118,27 +118,27 @@ def parse_lisans_item(item):
         "ucret_burs": safe_extract(8) if len(item) > 8 else None,
         "ogretim_turu": safe_extract(9) if len(item) > 9 else None,
         "kontenjan": {
-            "2023": safe_extract(10, 1, 'red'),
-            "2022": safe_extract(10, 2, 'purple'),
-            "2021": safe_extract(10, 3, 'blue'),
-            "2020": safe_extract(10, 4, 'green')
+            "2024": safe_extract(10, 1, 'red'),
+            "2023": safe_extract(10, 2, 'purple'),
+            "2022": safe_extract(10, 3, 'blue'),
+            "2021": safe_extract(10, 4, 'green')
         },
         "yerlesen": {
-            "2023": safe_extract(15, 1, 'red'),
-            "2022": safe_extract(15, 2, 'purple'),
-            "2021": safe_extract(15, 3, 'blue'),
-            "2020": safe_extract(15, 4, 'green')
+            "2024": safe_extract(15, 1, 'red'),
+            "2023": safe_extract(15, 2, 'purple'),
+            "2022": safe_extract(15, 3, 'blue'),
+            "2021": safe_extract(15, 4, 'green')
         },
         "tbs": {
-            "2023": safe_replace(safe_extract(19, 1, 'red'), '.', ''),
-            "2022": safe_replace(safe_extract(19, 2, 'purple'), '.', ''),
-            "2021": safe_replace(safe_extract(19, 3, 'blue'), '.', ''),
-            "2020": safe_replace(safe_extract(19, 4, 'green'), '.', '')
+            "2024": safe_replace(safe_extract(19, 1, 'red'), '.', ''),
+            "2023": safe_replace(safe_extract(19, 2, 'purple'), '.', ''),
+            "2022": safe_replace(safe_extract(19, 3, 'blue'), '.', ''),
+            "2021": safe_replace(safe_extract(19, 4, 'green'), '.', '')
         },
         "taban": {
-            "2023": safe_replace(safe_extract(27, 1, 'red'), ',', '.'),
-            "2022": safe_replace(safe_extract(27, 2, 'purple'), ',', '.'),
-            "2021": safe_replace(safe_extract(27, 3, 'blue'), ',', '.'),
-            "2020": safe_replace(safe_extract(27, 4, 'green'), ',', '.')
+            "2024": safe_replace(safe_extract(27, 1, 'red'), ',', '.'),
+            "2023": safe_replace(safe_extract(27, 2, 'purple'), ',', '.'),
+            "2022": safe_replace(safe_extract(27, 3, 'blue'), ',', '.'),
+            "2021": safe_replace(safe_extract(27, 4, 'green'), ',', '.')
         }
     }

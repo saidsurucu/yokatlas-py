@@ -3,11 +3,11 @@ from bs4 import BeautifulSoup
 import asyncio
 
 async def fetch_lise_grubu_ve_tipi_dagilimi(program_id, year):
-    if year not in [2021, 2022, 2023]:
-        return {"error": "Invalid year. Only 2021, 2022, and 2023 are supported."}
+    if year not in [2021, 2022, 2023, 2024]:
+        return {"error": "Invalid year. Only 2021, 2022, 2023 and 2024 are supported."}
     
     base_url = "https://yokatlas.yok.gov.tr"
-    url_suffix = f"/{year}/content/onlisans-dynamic/3050a.php?y={program_id}" if year != 2023 else f"/content/onlisans-dynamic/3050a.php?y={program_id}"
+    url_suffix = f"/{year}/content/onlisans-dynamic/3050a.php?y={program_id}" if year != 2024 else f"/content/onlisans-dynamic/3050a.php?y={program_id}"
     url = f"{base_url}{url_suffix}"
     
     headers = {
