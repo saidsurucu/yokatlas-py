@@ -30,7 +30,7 @@ import asyncio
 
 
 async def example_yokatlas_onlisansatlasi():
-    onlisans_atlasi = YOKATLASOnlisansAtlasi({'program_id': '203550463', 'year': 2023})
+    onlisans_atlasi = YOKATLASOnlisansAtlasi({'program_id': '203550463', 'year': 2024})
     result = await onlisans_atlasi.fetch_all_details()
     print("YOKATLAS Onlisans Atlasi Result:", result)
 
@@ -38,7 +38,7 @@ asyncio.run(example_yokatlas_onlisansatlasi())
 
 
 async def example_yokatlas_lisansatlasi():
-    lisans_atlasi = YOKATLASLisansAtlasi({'program_id': '104111719', 'year': 2023})
+    lisans_atlasi = YOKATLASLisansAtlasi({'program_id': '104111719', 'year': 2024})
     result = await lisans_atlasi.fetch_all_details()
     print("YOKATLAS lisans Atlasi Result:", result)
 
