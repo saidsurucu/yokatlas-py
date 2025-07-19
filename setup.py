@@ -16,7 +16,8 @@ setup(
     install_requires=[
         "requests",
         "urllib3",
-        "aiohttp"   
+        "aiohttp",
+        "beautifulsoup4"
     ],
     classifiers=[
         "Programming Language :: Python :: 3",
