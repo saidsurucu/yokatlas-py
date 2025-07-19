@@ -30,10 +30,9 @@ async def fetch_sehir_ve_cografi_bolge_dagilimi(program_id: str, year: int) -> d
             response = await client.get(url, headers=headers)
             response.raise_for_status()
             html_content = response.text
+            return parse_html_to_json(html_content)
         except httpx.RequestError as e:
             return {"error": f"Failed to fetch data from YOKATLAS: {str(e)}"}
-
-    return parse_html_to_json(html_content)
 
 def parse_html_to_json(html_content: str) -> Dict[str, List[Dict[str, str]]]:
     """Parse HTML content to extract şehir ve coğrafi bölge dağılımı data."""
