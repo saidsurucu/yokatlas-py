@@ -1,6 +1,6 @@
 [project]
 name = "yokatlas-py"
-version = "0.4.0"
+version = "0.4.1"
 description = "A python wrapper for YOKATLAS API"
 readme = "README.md"
 requires-python = ">=3.9"
