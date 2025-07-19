@@ -53,6 +53,20 @@ class YOKATLASLisansTercihSihirbazi:
         )
 
         if response.status_code == 200:
-            return parse_lisans_results(response.json())
+            try:
+                # Try to parse as JSON
+                return parse_lisans_results(response.json())
+            except:
+                # If JSON parsing fails, try to extract JSON from HTML response
+                import re
+                json_match = re.search(r'\{.*\}', response.text, re.DOTALL)
+                if json_match:
+                    import json
+                    try:
+                        data = json.loads(json_match.group(0))
+                        return parse_lisans_results(data)
+                    except:
+                        pass
+                return {"error": "Failed to parse response from YOKATLAS API"}
         else:
             return {"error": f"Failed to fetch data from YOKATLAS API. Status code: {response.status_code}"}

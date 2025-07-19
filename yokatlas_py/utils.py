@@ -20,7 +20,13 @@ def extract_text_from_html(html):
 
 def parse_onlisans_results(data):
     results = []
-    for item in data.get('data', []):
+    # Handle both dict and list responses
+    if isinstance(data, dict):
+        items = data.get('data', [])
+    else:
+        items = data if isinstance(data, list) else []
+    
+    for item in items:
         result = parse_onlisans_item(item)
         results.append(result)
     return results
@@ -82,7 +88,13 @@ def parse_onlisans_item(item):
 
 def parse_lisans_results(data):
     results = []
-    for item in data.get('data', []):
+    # Handle both dict and list responses
+    if isinstance(data, dict):
+        items = data.get('data', [])
+    else:
+        items = data if isinstance(data, list) else []
+    
+    for item in items:
         result = parse_lisans_item(item)
         results.append(result)
     return results
