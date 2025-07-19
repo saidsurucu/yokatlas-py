@@ -78,51 +78,49 @@ from yokatlas_py import (
     YOKATLASOnlisansAtlasi,
     YOKATLASOnlisansTercihSihirbazi
 )
-import asyncio
 
-async def example_yokatlas_onlisansatlasi():
-    onlisans_atlasi = YOKATLASOnlisansAtlasi({'program_id': '203550463', 'year': 2024})
-    result = await onlisans_atlasi.fetch_all_details()
-    print("YOKATLAS Onlisans Atlasi Result:", result)
-
-asyncio.run(example_yokatlas_onlisansatlasi())
-
-
-async def example_yokatlas_lisansatlasi():
+# Atlas classes use async methods
+async def example_atlas_usage():
+    # Lisans (Bachelor's) program details
     lisans_atlasi = YOKATLASLisansAtlasi({'program_id': '104111719', 'year': 2024})
-    result = await lisans_atlasi.fetch_all_details()
-    print("YOKATLAS lisans Atlasi Result:", result)
+    lisans_result = await lisans_atlasi.fetch_all_details()
+    print("YOKATLAS Lisans Atlas Result:", lisans_result)
+    
+    # Önlisans (Associate) program details  
+    onlisans_atlasi = YOKATLASOnlisansAtlasi({'program_id': '203550463', 'year': 2024})
+    onlisans_result = await onlisans_atlasi.fetch_all_details()
+    print("YOKATLAS Önlisans Atlas Result:", onlisans_result)
 
-asyncio.run(example_yokatlas_lisansatlasi())
-
-def example_yokatlas_lisanstercihsihirbazi():
-    # Search for programs at state universities in Ankara
-    params = {
+# Search classes use sync methods
+def example_search_usage():
+    # Search for bachelor's programs
+    lisans_params = {
         'puan_turu': 'say',          # Score type: say, ea, söz, dil
         'sehir': 'ANKARA',           # Filter by city
         'universite_turu': 'Devlet', # State universities only
         'length': 5                  # Results per page
     }
-    lisans_tercih = YOKATLASLisansTercihSihirbazi(params)
-    result = lisans_tercih.search()
-    print("YOKATLAS Lisans Tercih Sihirbazi Result:", result)
-
-example_yokatlas_lisanstercihsihirbazi()
-
-
-def example_yokatlas_onlisanstercihsihirbazi():
-    # Search for programs in Istanbul
-    params = {
+    lisans_search = YOKATLASLisansTercihSihirbazi(lisans_params)
+    lisans_results = lisans_search.search()
+    print("Lisans Search Results:", lisans_results)
+    
+    # Search for associate programs
+    onlisans_params = {
         'puan_turu': 'tyt',         # Score type for associate degrees
         'sehir': 'İSTANBUL',        # City filter
         'universite_turu': 'Devlet', # State universities
         'length': 10                # Results per page
     }
-    onlisans_tercih = YOKATLASOnlisansTercihSihirbazi(params)
-    result = onlisans_tercih.search()
-    print("YOKATLAS Onlisans Tercih Sihirbazi Result:", result)
+    onlisans_search = YOKATLASOnlisansTercihSihirbazi(onlisans_params)
+    onlisans_results = onlisans_search.search()
+    print("Önlisans Search Results:", onlisans_results)
 
-example_yokatlas_onlisanstercihsihirbazi()
+# Run examples
+example_search_usage()
+
+# For async atlas usage, use asyncio in your environment:
+# import asyncio
+# asyncio.run(example_atlas_usage())
 ```
 
 ## Pydantic Models | Pydantic Modelleri
