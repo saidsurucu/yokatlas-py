@@ -1,10 +1,16 @@
 
 # YOKATLAS-py
 
-A Python wrapper for YOKATLAS API.
+A modern, type-safe Python wrapper for YOKATLAS API with pydantic validation.
+
+[![Python 3.9+](https://img.shields.io/badge/python-3.9+-blue.svg)](https://www.python.org/downloads/)
+[![Type Hints](https://img.shields.io/badge/type%20hints-yes-brightgreen.svg)](https://docs.python.org/3/library/typing.html)
+[![Pydantic](https://img.shields.io/badge/pydantic-2.11+-orange.svg)](https://pydantic.dev)
 
 
 ## Installation | Kurulum
+
+**Requirements | Gereksinimler:** Python 3.9+
 
 You can install the package using pip:
 
@@ -14,34 +20,65 @@ Paketi pip kullanarak yükleyebilirsiniz:
 pip install yokatlas-py
 ```
 
+Or with uv (recommended):
+
+Ya da uv ile (önerilen):
+
+```sh
+uv add yokatlas-py
+```
+
+## Features | Özellikler
+
+✅ **Type Safe**: Full type hints and pydantic validation  
+✅ **Modern Python**: Requires Python 3.9+ with modern syntax  
+✅ **Fast HTTP**: Uses httpx for both sync and async operations  
+✅ **Validation**: Runtime validation of all API responses  
+✅ **IDE Support**: Enhanced autocomplete and error detection  
+
 ## How to | Kullanım
 
-### University Program Search | Üniversite Program Arama
-
-The search functionality supports filtering by various criteria:
-
-Arama fonksiyonu çeşitli kriterlere göre filtreleme destekler:
-
-**Available Parameters | Kullanılabilir Parametreler:**
-- `puan_turu`: Score type | Puan türü (`say`, `ea`, `söz`, `dil` for lisans; `tyt` for önlisans)
-- `program`: Program name search | Program adı arama
-- `universite`: University name search | Üniversite adı arama  
-- `sehir`: City filter | Şehir filtresi
-- `universite_turu`: University type | Üniversite türü (`Devlet`, `Vakıf`)
-- `ucret`: Fee type | Ücret türü (`Burslu`, `Ücretli`) 
-- `ogretim_turu`: Education type | Öğretim türü (`Örgün`, `İkinci Öğretim`)
-- `length`: Results per page | Sayfa başına sonuç (default: 50)
-- `page`: Page number | Sayfa numarası (default: 1)
-
+### Quick Start with Type Safety | Tip Güvenli Hızlı Başlangıç
 
 ```python
-from yokatlas_py.lisansatlasi import YOKATLASLisansAtlasi
-from yokatlas_py.lisanstercihsihirbazi import YOKATLASLisansTercihSihirbazi
-from yokatlas_py.onlisansatlasi import YOKATLASOnlisansAtlasi
-from yokatlas_py.onlisanstercihsihirbazi import YOKATLASOnlisansTercihSihirbazi
+from yokatlas_py import YOKATLASLisansTercihSihirbazi
+from yokatlas_py.models import SearchParams, ProgramInfo
+
+# Type-safe parameter validation
+params = SearchParams(
+    puan_turu="say",
+    length=10,
+    sehir="İstanbul",
+    universite_turu="Devlet"
+)
+
+# Perform search with validated parameters
+search = YOKATLASLisansTercihSihirbazi(params.model_dump(exclude_none=True))
+results = search.search()
+
+# Process results with validation
+for result in results[:3]:
+    try:
+        program = ProgramInfo(**result)
+        print(f"🎓 {program.uni_adi}")
+        print(f"📚 {program.program_adi}")
+        print(f"🏛️ {program.fakulte}")
+        print(f"📍 {program.sehir_adi}")
+        print("---")
+    except ValidationError as e:
+        print(f"⚠️ Invalid data: {e}")
+```
+
+### Traditional Usage | Geleneksel Kullanım
+
+```python
+from yokatlas_py import (
+    YOKATLASLisansAtlasi,
+    YOKATLASLisansTercihSihirbazi,
+    YOKATLASOnlisansAtlasi,
+    YOKATLASOnlisansTercihSihirbazi
+)
 import asyncio
-
-
 
 async def example_yokatlas_onlisansatlasi():
     onlisans_atlasi = YOKATLASOnlisansAtlasi({'program_id': '203550463', 'year': 2024})
@@ -88,6 +125,72 @@ def example_yokatlas_onlisanstercihsihirbazi():
 example_yokatlas_onlisanstercihsihirbazi()
 ```
 
+## Pydantic Models | Pydantic Modelleri
+
+The library includes comprehensive pydantic models for type safety and validation:
+
+Kütüphane tip güvenliği ve doğrulama için kapsamlı pydantic modelleri içerir:
+
+### Available Models | Mevcut Modeller
+
+- **SearchParams**: Search parameter validation
+- **ProgramInfo**: University program information  
+- **YearlyData**: Year-based statistical data
+- **ErrorResponse**: Error handling and reporting
+
+### Example with Validation | Doğrulama ile Örnek
+
+```python
+from yokatlas_py.models import SearchParams, ProgramInfo
+from pydantic import ValidationError
+
+# Invalid search parameters will be caught
+try:
+    params = SearchParams(
+        puan_turu="invalid_type",  # Invalid score type
+        length=-5  # Invalid length
+    )
+except ValidationError as e:
+    print(f"Validation error: {e}")
+
+# Valid parameters pass validation
+params = SearchParams(
+    puan_turu="say",
+    sehir="İstanbul", 
+    length=10
+)
+```
+
+## Migration from v0.3.x | v0.3.x'den Geçiş
+
+### Breaking Changes | Değişiklikler
+
+- **Python 3.9+ Required**: Updated from 3.8+ to 3.9+
+- **New Dependencies**: Added pydantic and typing-extensions
+- **Type Hints**: All functions now have type annotations
+
+### Migration Steps | Geçiş Adımları
+
+1. **Update Python version to 3.9+**
+   ```bash
+   # Check your Python version
+   python --version
+   ```
+
+2. **Update the package**
+   ```bash
+   pip install --upgrade yokatlas-py
+   ```
+
+3. **Optional: Use new type-safe features**
+   ```python
+   # Old way (still works)
+   params = {"puan_turu": "say", "length": 10}
+   
+   # New way (with validation)
+   from yokatlas_py.models import SearchParams
+   params = SearchParams(puan_turu="say", length=10)
+   ```
 
 ## License | Lisans
 

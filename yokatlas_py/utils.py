@@ -1,9 +1,11 @@
 import json
 import os
+from typing import Any, Optional, Union
 from bs4 import BeautifulSoup
 from urllib.parse import parse_qsl
 
-def load_column_data():
+def load_column_data() -> dict[str, str]:
+    """Load column data from JSON file and return as dictionary."""
     json_path = os.path.join(os.path.dirname(__file__), 'columnData.json')
     with open(json_path, 'r') as file:
         column_data = json.load(file)
@@ -12,13 +14,15 @@ def load_column_data():
     return {}
 
 
-def extract_text_from_html(html):
+def extract_text_from_html(html: Optional[str]) -> Optional[str]:
+    """Extract plain text from HTML string."""
     if not html:
         return None
     soup = BeautifulSoup(html, 'html.parser')
     return soup.get_text(strip=True)
 
-def parse_onlisans_results(data):
+def parse_onlisans_results(data: Union[dict[str, Any], list[Any]]) -> list[dict[str, Any]]:
+    """Parse onlisans search results from API response."""
     results = []
     # Handle both dict and list responses
     if isinstance(data, dict):
@@ -31,8 +35,9 @@ def parse_onlisans_results(data):
         results.append(result)
     return results
 
-def parse_onlisans_item(item):
-    def get_value(index, split_index=None, color=None):
+def parse_onlisans_item(item: list[str]) -> dict[str, Any]:
+    """Parse a single onlisans item from API response."""
+    def get_value(index: int, split_index: Optional[int] = None, color: Optional[str] = None) -> Optional[str]:
         try:
             value = item[index]
             soup = BeautifulSoup(value, 'html.parser')
@@ -47,15 +52,15 @@ def parse_onlisans_item(item):
         except (IndexError, KeyError):
             return None
 
-    def clean_text(text):
+    def clean_text(text: Optional[str]) -> Optional[str]:
         if text:
             return text.replace('Listeme Ekle', '').strip()
         return text
 
-    def format_tbs(value):
+    def format_tbs(value: Optional[str]) -> Optional[str]:
         return value.replace('.', '') if value else None
 
-    def format_taban(value):
+    def format_taban(value: Optional[str]) -> Optional[str]:
         return value.replace(',', '.') if value else None
 
     return {
@@ -86,7 +91,8 @@ def parse_onlisans_item(item):
         }
     }
 
-def parse_lisans_results(data):
+def parse_lisans_results(data: Union[dict[str, Any], list[Any]]) -> list[dict[str, Any]]:
+    """Parse lisans search results from API response."""
     results = []
     # Handle both dict and list responses
     if isinstance(data, dict):
@@ -99,8 +105,9 @@ def parse_lisans_results(data):
         results.append(result)
     return results
 
-def parse_lisans_item(item):
-    def safe_extract(index, sub_index=None, color=None):
+def parse_lisans_item(item: list[str]) -> dict[str, Any]:
+    """Parse a single lisans item from API response."""
+    def safe_extract(index: int, sub_index: Optional[int] = None, color: Optional[str] = None) -> Optional[str]:
         try:
             if sub_index is not None:
                 content = item[index].split('<br>')[sub_index]
@@ -116,7 +123,7 @@ def parse_lisans_item(item):
         except (IndexError, AttributeError):
             return None
 
-    def safe_replace(value, old, new):
+    def safe_replace(value: Optional[str], old: str, new: str) -> Optional[str]:
         return value.replace(old, new) if value else None
 
     return {

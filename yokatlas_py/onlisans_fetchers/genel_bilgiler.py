@@ -1,8 +1,19 @@
-import aiohttp
+import httpx
 from bs4 import BeautifulSoup
 import asyncio
+from typing import Any, Optional, Union
 
-async def fetch_genel_bilgiler(program_id, year):
+async def fetch_genel_bilgiler(program_id: str, year: int) -> dict[str, Any]:
+    """
+    Fetch data for a specific program and year.
+    
+    Args:
+        program_id: YÖK program kodu (9 digit string)
+        year: Year (2021-2024)
+        
+    Returns:
+        Dictionary containing fetched data or error message
+    """
     if year not in [2021, 2022, 2023, 2024]:
         return {"error": "Invalid year. Only 2021, 2022, 2023 and 2024 are supported."}
 
@@ -10,14 +21,15 @@ async def fetch_genel_bilgiler(program_id, year):
     url_suffix = f"/{year}/content/onlisans-dynamic/3000_1.php?y={program_id}" if year != 2024 else f"/content/onlisans-dynamic/3000_1.php?y={program_id}"
     url = f"{base_url}{url_suffix}"
 
-    async with aiohttp.ClientSession() as session:
-        async with session.get(url, ssl=False) as response:
-            if response.status != 200:
-                return {"error": "Failed to fetch data from YOKATLAS"}
+    async with httpx.AsyncClient(verify=False) as client:
+        response = await client.get(url)
+        if response.status_code != 200:
+            return {"error": "Failed to fetch data from YOKATLAS"}
 
-            html_content = await response.text()
+            html_content = response.text
 
-    def parse_html_to_json(html_content):
+    def parse_html_to_json(html_content: str) -> dict[str, Any]:
+        """Parse HTML content to extract structured data."""
         soup = BeautifulSoup(html_content.replace('---','0'), 'html.parser')
         tables = soup.find_all('table', {'class': 'table table-bordered'})
 

@@ -1,16 +1,26 @@
-import requests
+import httpx
 from urllib.parse import urlencode
+from typing import Any, Optional, Union
 from .utils import load_column_data, parse_onlisans_results
+from .models import SearchParams, ProgramInfo
 import urllib3
 
 urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
 
 class YOKATLASOnlisansTercihSihirbazi:
-    def __init__(self, params):
+    """YOKATLAS Önlisans Tercih Sihirbazı - Search interface for associate degree programs."""
+    
+    def __init__(self, params: dict[str, Any]) -> None:
+        """
+        Initialize search client with parameters.
+        
+        Args:
+            params: Search parameters dictionary
+        """
         self.params = params
         
         # Load base column structure from JSON
-        self.columns = load_column_data()
+        self.columns: dict[str, str] = load_column_data()
         
         # Set default values and ordering
         self._set_defaults()
@@ -18,9 +28,9 @@ class YOKATLASOnlisansTercihSihirbazi:
         # Apply user parameters
         self._apply_params(params)
 
-    def _set_defaults(self):
-        # Default values for main parameters
-        defaults = {
+    def _set_defaults(self) -> None:
+        """Set default values for search parameters."""
+        defaults: dict[str, Union[str, int]] = {
             "draw": 2,
             "start": 0,
             "length": 50,
@@ -51,9 +61,9 @@ class YOKATLASOnlisansTercihSihirbazi:
         for key, value in defaults.items():
             self.columns[key] = value
 
-    def _apply_params(self, params):
-        # Map user-friendly parameters to API parameters
-        param_mapping = {
+    def _apply_params(self, params: dict[str, Any]) -> None:
+        """Apply user parameters to search configuration."""
+        param_mapping: dict[str, Optional[str]] = {
             "puan_turu": "puan_turu",  # tyt
             "universite": "universite",
             "program": "program",
@@ -79,7 +89,13 @@ class YOKATLASOnlisansTercihSihirbazi:
                 elif api_key:
                     self.columns[api_key] = params[user_key]
 
-    def search(self):
+    def search(self) -> list[dict[str, Any]]:
+        """
+        Perform search for önlisans programs.
+        
+        Returns:
+            List of program dictionaries or error information
+        """
         # Prepare the request
         payload = urlencode(self.columns)
         
@@ -91,7 +107,7 @@ class YOKATLASOnlisansTercihSihirbazi:
         }
 
         try:
-            response = requests.post(
+            response = httpx.post(
                 "https://yokatlas.yok.gov.tr/server_side/server_processing-atlas2016-TS-t3.php",
                 data=payload,
                 headers=headers,
@@ -119,5 +135,5 @@ class YOKATLASOnlisansTercihSihirbazi:
             else:
                 return {"error": f"HTTP {response.status_code}: {response.text[:200]}"}
                 
-        except requests.exceptions.RequestException as e:
+        except httpx.RequestError as e:
             return {"error": f"Request failed: {str(e)}"}

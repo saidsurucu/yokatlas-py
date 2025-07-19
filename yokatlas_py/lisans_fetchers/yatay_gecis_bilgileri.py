@@ -1,8 +1,19 @@
-import aiohttp
+import httpx
 from bs4 import BeautifulSoup
 import asyncio
+from typing import Any, Optional, Union
 
-async def fetch_yatay_gecis_bilgileri(program_id, year):
+async def fetch_yatay_gecis_bilgileri(program_id: str, year: int) -> dict[str, Any]:
+    """
+    Fetch data for a specific program and year.
+    
+    Args:
+        program_id: YÖK program kodu (9 digit string)
+        year: Year (2021-2024)
+        
+    Returns:
+        Dictionary containing fetched data or error message
+    """
     if year not in [2021, 2022, 2023, 2024]:
         return {"error": "Invalid year. Only 2021, 2022, 2023 and 2024 are supported."}
 
@@ -14,12 +25,12 @@ async def fetch_yatay_gecis_bilgileri(program_id, year):
         'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36'
     }
 
-    async with aiohttp.ClientSession() as session:
+    async with httpx.AsyncClient(verify=False) as client:
         try:
-            async with session.get(url, headers=headers, ssl=False) as response:
-                response.raise_for_status()
-                html_content = await response.text()
-        except aiohttp.ClientError as e:
+            response = await client.get(url, headers=headers)
+            response.raise_for_status()
+            html_content = response.text
+        except httpx.RequestError as e:
             return {"error": f"Failed to fetch data from YOKATLAS: {str(e)}"}
 
     soup = BeautifulSoup(html_content.replace('---','0'), 'html.parser')
