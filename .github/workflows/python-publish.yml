@@ -48,3 +48,5 @@ jobs:
       with:
         # Uses trusted publishing, no token needed
         repository-url: https://upload.pypi.org/legacy/
+        verbose: true
+        print-hash: true
