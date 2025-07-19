@@ -27,7 +27,7 @@ async def fetch_cinsiyet_dagilimi(program_id: str, year: int) -> dict[str, Any]:
         if response.status_code != 200:
             return {"error": "Failed to fetch data from YOKATLAS"}
 
-            html_content = response.text
+        html_content = response.text
 
     def parse_html_to_json(html_content: str) -> dict[str, Any]:
         """Parse HTML content to extract structured data."""

@@ -27,7 +27,7 @@ async def fetch_kontenjan_yerlesme(program_id: str, year: int) -> dict[str, Any]
             if response.status_code != 200:
                 return {"error": "Failed to fetch data from YOKATLAS"}
 
-                html_content = response.text
+            html_content = response.text
         except httpx.RequestError as e:
             return {"error": f"Failed to fetch data from YOKATLAS: {str(e)}"}
 
