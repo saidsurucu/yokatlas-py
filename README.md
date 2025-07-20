@@ -35,14 +35,52 @@ uv add yokatlas-py
 ✅ **Fast HTTP**: Uses httpx for both sync and async operations  
 ✅ **Validation**: Runtime validation of all API responses  
 ✅ **IDE Support**: Enhanced autocomplete and error detection  
+✅ **Smart Search**: Fuzzy university matching and flexible program name search  
+✅ **Complete Data**: All 235 lisans + 176 önlisans universities with 450+ programs  
 
 ## How to | Kullanım
 
-### Quick Start with Type Safety | Tip Güvenli Hızlı Başlangıç
+### Quick Start with Smart Search | Akıllı Arama ile Hızlı Başlangıç
+
+```python
+from yokatlas_py import search_lisans_programs, search_onlisans_programs
+
+# 🎯 Smart fuzzy search - works with partial names and abbreviations
+# Akıllı bulanık arama - kısmi isimler ve kısaltmalarla çalışır
+
+# Search for bachelor's programs with fuzzy matching
+results = search_lisans_programs({
+    "uni_adi": "boğaziçi",      # Finds "BOĞAZİÇİ ÜNİVERSİTESİ"
+    "program_adi": "bilgisayar", # Finds all computer-related programs
+    "sehir": "istanbul"          # Case-insensitive city matching
+})
+
+print(f"📚 Found {len(results)} lisans programs:")
+for program in results[:3]:
+    print(f"🎓 {program['uni_adi']}")
+    print(f"💻 {program['program_adi']}")
+    print(f"📍 {program['sehir_adi']}")
+    print("---")
+
+# Search for associate programs with abbreviations
+onlisans_results = search_onlisans_programs({
+    "uni_adi": "anadolu",        # Finds "ANADOLU ÜNİVERSİTESİ"
+    "program_adi": "turizm"      # Finds all tourism-related programs
+})
+
+print(f"🏫 Found {len(onlisans_results)} önlisans programs:")
+for program in onlisans_results[:2]:
+    print(f"🎓 {program['uni_adi']}")
+    print(f"🏖️ {program['program_adi']}")
+    print("---")
+```
+
+### Type-Safe Search | Tip Güvenli Arama
 
 ```python
 from yokatlas_py import YOKATLASLisansTercihSihirbazi
 from yokatlas_py.models import SearchParams, ProgramInfo
+from pydantic import ValidationError
 
 # Type-safe parameter validation
 params = SearchParams(
@@ -159,33 +197,87 @@ params = SearchParams(
 )
 ```
 
+## Smart Search Features | Akıllı Arama Özellikleri
+
+### Fuzzy University Matching | Bulanık Üniversite Eşleştirme
+
+The library automatically matches partial and abbreviated university names:
+
+```python
+from yokatlas_py import search_lisans_programs
+
+# All of these work and find "BOĞAZİÇİ ÜNİVERSİTESİ"
+search_lisans_programs({"uni_adi": "boğaziçi"})
+search_lisans_programs({"uni_adi": "bogazici"})  # Without Turkish chars
+search_lisans_programs({"uni_adi": "boun"})      # Common abbreviation
+
+# Common university abbreviations supported:
+# "odtu"/"metu" → "ORTA DOĞU TEKNİK ÜNİVERSİTESİ"
+# "itu" → "İSTANBUL TEKNİK ÜNİVERSİTESİ" 
+# "hacettepe" → "HACETTEPE ÜNİVERSİTESİ"
+```
+
+### Flexible Program Matching | Esnek Program Eşleştirme
+
+Partial program names automatically find all related programs:
+
+```python
+# "bilgisayar" finds all computer-related programs:
+# - "Bilgisayar Mühendisliği"
+# - "Bilgisayar Bilimleri" 
+# - "Bilgisayar ve Öğretim Teknolojileri Öğretmenliği"
+
+results = search_lisans_programs({"program_adi": "bilgisayar"})
+
+# "mühendislik" finds all engineering programs
+engineering_programs = search_lisans_programs({"program_adi": "mühendislik"})
+```
+
+### Universal Search | Evrensel Arama
+
+Search both lisans and önlisans programs simultaneously:
+
+```python
+from yokatlas_py import search_programs
+
+# Search both program types at once
+all_results = search_programs({
+    "uni_adi": "anadolu",
+    "program_adi": "bilgisayar"
+})
+
+print(f"Lisans programs: {len(all_results['lisans'])}")
+print(f"Önlisans programs: {len(all_results['onlisans'])}")
+```
+
 ## Migration from v0.3.x | v0.3.x'den Geçiş
 
-### Breaking Changes | Değişiklikler
+### New Features in v0.4.2+ | v0.4.2+'daki Yeni Özellikler
 
-- **Python 3.9+ Required**: Updated from 3.8+ to 3.9+
-- **New Dependencies**: Added pydantic and typing-extensions
-- **Type Hints**: All functions now have type annotations
+- **Smart Search**: Use `search_lisans_programs()` and `search_onlisans_programs()` for better search experience
+- **Fuzzy Matching**: University and program names are matched intelligently
+- **Complete Data**: All Turkish universities and programs included
 
 ### Migration Steps | Geçiş Adımları
 
-1. **Update Python version to 3.9+**
-   ```bash
-   # Check your Python version
-   python --version
-   ```
-
-2. **Update the package**
+1. **Update the package**
    ```bash
    pip install --upgrade yokatlas-py
    ```
 
-3. **Optional: Use new type-safe features**
+2. **Use new smart search functions (recommended)**
    ```python
    # Old way (still works)
-   params = {"puan_turu": "say", "length": 10}
+   from yokatlas_py import YOKATLASLisansTercihSihirbazi
+   search = YOKATLASLisansTercihSihirbazi({"universite": "BOĞAZİÇİ ÜNİVERSİTESİ"})
    
-   # New way (with validation)
+   # New way (with fuzzy matching)
+   from yokatlas_py import search_lisans_programs
+   results = search_lisans_programs({"uni_adi": "boğaziçi"})  # Much easier!
+   ```
+
+3. **Optional: Use type-safe features**
+   ```python
    from yokatlas_py.models import SearchParams
    params = SearchParams(puan_turu="say", length=10)
    ```
