@@ -30,9 +30,9 @@ class YOKATLASSettings(BaseSettings):
 
     # Supported years
     supported_years: List[int] = Field(
-        [2021, 2022, 2023, 2024], description="Supported years"
+        [2022, 2023, 2024, 2025], description="Supported years"
     )
-    current_year: int = Field(2024, description="Current/default year")
+    current_year: int = Field(2025, description="Current/default year")
 
     # Headers
     user_agent: str = Field(
