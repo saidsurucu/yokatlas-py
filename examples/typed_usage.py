@@ -103,7 +103,7 @@ def example_configuration():
     print(f"SSL verification: {settings.verify_ssl}")
     
     # Check if year is supported
-    test_year = 2024
+    test_year = 2025
     if settings.is_year_supported(test_year):
         print(f"✓ Year {test_year} is supported")
     else:

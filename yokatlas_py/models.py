@@ -159,17 +159,17 @@ class SehirVeCografiBolgeResponse(FetcherResponse):
 class YearRange(BaseModel):
     """Valid year range for API calls"""
 
-    min_year: int = Field(2021, description="Minimum supported year")
-    max_year: int = Field(2024, description="Maximum supported year")
+    min_year: int = Field(2022, description="Minimum supported year")
+    max_year: int = Field(2025, description="Maximum supported year")
     supported_years: List[int] = Field(
-        [2021, 2022, 2023, 2024], description="Supported years"
+        [2022, 2023, 2024, 2025], description="Supported years"
     )
 
     @field_validator("supported_years")
     @classmethod
     def validate_years(cls, v):
-        if not all(isinstance(year, int) and 2021 <= year <= 2024 for year in v):
-            raise ValueError("All years must be integers between 2021 and 2024")
+        if not all(isinstance(year, int) and 2022 <= year <= 2025 for year in v):
+            raise ValueError("All years must be integers between 2022 and 2025")
         return v
 
 

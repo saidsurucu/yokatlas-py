@@ -1,0 +1,115 @@
+name: GitHub Release
+
+on:
+  push:
+    tags:
+      - "v*" # Trigger on version tags like v1.0.0, v0.5.1, etc.
+  workflow_dispatch: # Manual trigger
+    inputs:
+      tag:
+        description: "Tag to release (e.g., v1.0.0)"
+        required: true
+        default: "v0.5.0"
+
+jobs:
+  build-and-release:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write # Required for creating releases
+
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0 # Fetch full history for proper tag handling
+
+      - name: Install uv
+        uses: astral-sh/setup-uv@v4
+        with:
+          version: "latest"
+
+      - name: Set up Python
+        run: uv python install 3.12
+
+      - name: Build package
+        run: uv build
+
+      - name: Get package version
+        id: version
+        run: |
+          if [ "${{ github.event_name }}" == "workflow_dispatch" ]; then
+            VERSION="${{ github.event.inputs.tag }}"
+          else
+            VERSION="${{ github.ref_name }}"
+          fi
+          echo "version=${VERSION}" >> $GITHUB_OUTPUT
+          echo "version_clean=${VERSION#v}" >> $GITHUB_OUTPUT
+
+      - name: Verify built files
+        run: |
+          echo "Built files:"
+          ls -la dist/
+          echo "Contents:"
+          for file in dist/*; do
+            echo "📦 $(basename "$file")"
+          done
+
+      - name: Generate release notes
+        id: release_notes
+        run: |
+          cat > release_notes.md << 'EOF'
+          ## 🚀 yokatlas-py ${{ steps.version.outputs.version_clean }}
+
+          A Python wrapper for the YOKATLAS API - providing easy access to Turkish higher education data.
+
+          ### 📦 Installation
+          ```bash
+          pip install yokatlas-py==${{ steps.version.outputs.version_clean }}
+          ```
+
+          ### 📋 What's included
+          - **Source Distribution** (`yokatlas-py-${{ steps.version.outputs.version_clean }}.tar.gz`) - For building from source
+          - **Wheel Distribution** (`yokatlas_py-${{ steps.version.outputs.version_clean }}-py3-none-any.whl`) - For direct installation
+
+          ### 🔗 Links
+          - [📚 Documentation](https://github.com/saidsurucu/yokatlas-py#readme)
+          - [🐛 Report Issues](https://github.com/saidsurucu/yokatlas-py/issues)
+          - [📦 PyPI Package](https://pypi.org/project/yokatlas-py/)
+
+          ---
+
+          For detailed API documentation, examples, and usage instructions, please visit the [project repository](https://github.com/saidsurucu/yokatlas-py).
+          EOF
+
+          echo "Release notes generated successfully"
+
+      - name: Create GitHub Release
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: ${{ steps.version.outputs.version }}
+          name: "yokatlas-py ${{ steps.version.outputs.version_clean }}"
+          body_path: release_notes.md
+          draft: false
+          prerelease: ${{ contains(steps.version.outputs.version, 'alpha') || contains(steps.version.outputs.version, 'beta') || contains(steps.version.outputs.version, 'rc') }}
+          files: |
+            dist/*.tar.gz
+            dist/*.whl
+          generate_release_notes: true # Append auto-generated notes
+          append_body: true
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Release Summary
+        run: |
+          echo "## 🎉 Release Created Successfully!" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "**Version:** ${{ steps.version.outputs.version_clean }}" >> $GITHUB_STEP_SUMMARY
+          echo "**Tag:** ${{ steps.version.outputs.version }}" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "### 📦 Released Artifacts:" >> $GITHUB_STEP_SUMMARY
+          for file in dist/*; do
+            filename=$(basename "$file")
+            filesize=$(ls -lh "$file" | awk '{print $5}')
+            echo "- **$filename** ($filesize)" >> $GITHUB_STEP_SUMMARY
+          done
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "🔗 [View Release](https://github.com/${{ github.repository }}/releases/tag/${{ steps.version.outputs.version }})" >> $GITHUB_STEP_SUMMARY

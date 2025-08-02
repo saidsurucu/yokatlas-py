@@ -144,6 +144,8 @@ def find_best_university_match(name: str, program_type: str = "lisans") -> str:
         "DEU": "DOKUZ EYLÜL ÜNİVERSİTESİ",
         "İYTE": "İZMİR YÜKSEK TEKNOLOJİ ENSTİTÜSÜ",
         "IYTE": "İZMİR YÜKSEK TEKNOLOJİ ENSTİTÜSÜ",
+        "BOUN": "BOĞAZİÇİ ÜNİVERSİTESİ",
+        "BU": "BOĞAZİÇİ ÜNİVERSİTESİ",
     }
 
     if name_clean in common_abbreviations:
@@ -153,28 +155,6 @@ def find_best_university_match(name: str, program_type: str = "lisans") -> str:
     for university in university_list:
         if name_clean in university:
             return university
-
-    # Second try: look for universities where any significant word matches
-    name_words = [word for word in name_clean.split() if len(word) > 2]
-    best_matches = []
-
-    for university in university_list:
-        university_words = university.split()
-        matches_count = 0
-
-        for search_word in name_words:
-            for uni_word in university_words:
-                if search_word in uni_word or uni_word in search_word:
-                    matches_count += 1
-                    break
-
-        if matches_count > 0:
-            best_matches.append((university, matches_count))
-
-    # Sort by number of matches and return the best one
-    if best_matches:
-        best_matches.sort(key=lambda x: x[1], reverse=True)
-        return best_matches[0][0]
 
     # Third try: Use difflib fuzzy matching
     matches = difflib.get_close_matches(
