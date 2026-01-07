@@ -1,427 +1,338 @@
-# YOKATLAS-py API Documentation
+# YOKATLAS-py API Dokümantasyonu
 
-Complete API reference for yokatlas-py library with smart search capabilities.
+Tam API referansı.
 
-## Table of Contents
+## İçindekiler
 
-- [Smart Search Functions](#smart-search-functions)
-- [Core Search Classes](#core-search-classes)
-- [Atlas Classes](#atlas-classes)
-- [Search Utilities](#search-utilities)
-- [Pydantic Models](#pydantic-models)
-- [Form Data](#form-data)
-- [Error Handling](#error-handling)
+- [Akıllı Arama Fonksiyonları](#akıllı-arama-fonksiyonları)
+- [Arama Sınıfları](#arama-sınıfları)
+- [Atlas Sınıfları](#atlas-sınıfları)
+- [Fetcher Sınıfları](#fetcher-sınıfları)
+- [HTTP Client](#http-client)
+- [Arama Yardımcıları](#arama-yardımcıları)
+- [Pydantic Modelleri](#pydantic-modelleri)
+- [Form Verileri](#form-verileri)
 
 ---
 
-## Smart Search Functions
+## Akıllı Arama Fonksiyonları
 
 ### `search_lisans_programs(params, smart_search=True)`
 
-Enhanced search for lisans (bachelor's) programs with fuzzy matching and intelligent parameter normalization.
+Bulanık eşleştirme ile lisans programı arama.
 
-**Parameters:**
-- `params` (`dict[str, Any]`): Search parameters
-- `smart_search` (`bool`, optional): Enable smart features. Default: `True`
-
-**Returns:**
-- `list[dict[str, Any]]`: List of matching programs
-
-**Example:**
 ```python
 from yokatlas_py import search_lisans_programs
 
-# Smart search with fuzzy matching
 results = search_lisans_programs({
-    "uni_adi": "boğaziçi",      # Fuzzy matches to "BOĞAZİÇİ ÜNİVERSİTESİ"
-    "program_adi": "bilgisayar", # Finds all computer programs
+    "uni_adi": "boğaziçi",       # "BOĞAZİÇİ ÜNİVERSİTESİ" bulur
+    "program_adi": "bilgisayar", # Tüm bilgisayar programlarını bulur
     "puan_turu": "say",
     "sehir": "istanbul"
 })
-
-print(f"Found {len(results)} programs")
 ```
 
-**Supported Parameters:**
-- `uni_adi` / `university` / `uni`: University name (supports fuzzy matching)
-- `program_adi` / `bolum` / `department`: Program name (supports partial matching)
-- `puan_turu` / `score_type`: Score type (`"say"`, `"ea"`, `"söz"`, `"dil"`)
-- `sehir` / `city` / `il`: City name
-- `universite_turu` / `uni_type`: University type (`"Devlet"`, `"Vakıf"`, `"KKTC"`, `"Yurt Dışı"`)
-- `ucret` / `fee`: Fee type (`"Ücretsiz"`, `"Ücretli"`, `"Burslu"`, etc.)
-- `ogretim_turu` / `education_type`: Education type (`"Örgün"`, `"İkinci"`, `"Açıköğretim"`, `"Uzaktan"`)
-- `length`: Results per page (default: 50)
-- `page`: Page number for pagination
+**Parametreler:**
+| Parametre | Alternatifler | Açıklama |
+|-----------|---------------|----------|
+| `uni_adi` | `university`, `uni` | Üniversite adı (bulanık) |
+| `program_adi` | `bolum`, `department` | Program adı (kısmi) |
+| `puan_turu` | `score_type` | `say`, `ea`, `söz`, `dil` |
+| `sehir` | `city`, `il` | Şehir |
+| `universite_turu` | `uni_type` | `Devlet`, `Vakıf`, `KKTC` |
+| `length` | - | Sayfa başına sonuç (varsayılan: 50) |
 
 ---
 
 ### `search_onlisans_programs(params, smart_search=True)`
 
-Enhanced search for önlisans (associate degree) programs with fuzzy matching.
+Önlisans programı arama.
 
-**Parameters:**
-- `params` (`dict[str, Any]`): Search parameters
-- `smart_search` (`bool`, optional): Enable smart features. Default: `True`
-
-**Returns:**
-- `list[dict[str, Any]]`: List of matching programs
-
-**Example:**
 ```python
 from yokatlas_py import search_onlisans_programs
 
-# Smart search for associate programs
 results = search_onlisans_programs({
-    "uni_adi": "anadolu",       # Fuzzy matches to "ANADOLU ÜNİVERSİTESİ"
-    "program_adi": "turizm",    # Finds all tourism programs
-    "sehir": "eskişehir"
+    "uni_adi": "anadolu",
+    "program_adi": "turizm",
+    "puan_turu": "tyt"
 })
-
-for program in results:
-    print(f"{program['uni_adi']} - {program['program_adi']}")
 ```
-
-**Note:** Önlisans programs use `"tyt"` score type instead of lisans score types.
 
 ---
 
-### `search_programs(params, program_type=None, smart_search=True)`
+### `search_programs(params, program_type=None)`
 
-Universal search function for both lisans and önlisans programs.
+Her iki program türünde arama.
 
-**Parameters:**
-- `params` (`dict[str, Any]`): Search parameters
-- `program_type` (`str`, optional): `"lisans"`, `"onlisans"`, or `None` for both
-- `smart_search` (`bool`, optional): Enable smart features. Default: `True`
-
-**Returns:**
-- `dict[str, list[dict[str, Any]]]`: Dictionary with `"lisans"` and/or `"onlisans"` keys
-
-**Example:**
 ```python
 from yokatlas_py import search_programs
 
-# Search both program types
-all_results = search_programs({
-    "uni_adi": "ankara",
-    "program_adi": "bilgisayar"
-})
-
-print(f"Lisans programs: {len(all_results['lisans'])}")
-print(f"Önlisans programs: {len(all_results['onlisans'])}")
-
-# Search only specific type
-lisans_only = search_programs({
-    "uni_adi": "odtu",
-    "program_adi": "mühendislik"
-}, program_type="lisans")
+all_results = search_programs({"uni_adi": "ankara"})
+print(f"Lisans: {len(all_results['lisans'])}")
+print(f"Önlisans: {len(all_results['onlisans'])}")
 ```
 
 ---
 
-## Core Search Classes
+## Arama Sınıfları
 
 ### `YOKATLASLisansTercihSihirbazi(params)`
 
-Direct interface to YOKATLAS lisans search API.
+Direkt YOKATLAS API erişimi.
 
-**Parameters:**
-- `params` (`dict[str, Any]`): Raw search parameters
-
-**Methods:**
-
-#### `search() -> list[dict[str, Any]]`
-Perform search and return results.
-
-**Example:**
 ```python
 from yokatlas_py import YOKATLASLisansTercihSihirbazi
 
-# Direct API usage
 search = YOKATLASLisansTercihSihirbazi({
     "puan_turu": "say",
-    "universite": "BOĞAZİÇİ ÜNİVERSİTESİ",  # Exact name required
-    "program": "Bilgisayar Mühendisliği",    # Exact name required
+    "universite": "BOĞAZİÇİ ÜNİVERSİTESİ",  # Tam isim gerekli
     "length": 10
 })
-
 results = search.search()
 ```
-
-**Required Exact Parameter Names:**
-- `universite`: Full university name
-- `program`: Exact program name
-- `puan_turu`: Score type
-- `sehir`: City name (uppercase)
-- `universite_turu`: University type
-- `ucret`: Fee type
-- `ogretim_turu`: Education type
-
----
 
 ### `YOKATLASOnlisansTercihSihirbazi(params)`
 
-Direct interface to YOKATLAS önlisans search API.
-
-**Parameters:**
-- `params` (`dict[str, Any]`): Raw search parameters
-
-**Methods:**
-
-#### `search() -> list[dict[str, Any]]`
-Perform search and return results.
-
-**Example:**
 ```python
 from yokatlas_py import YOKATLASOnlisansTercihSihirbazi
 
-# Direct önlisans search
 search = YOKATLASOnlisansTercihSihirbazi({
+    "puan_turu": "tyt",
     "universite": "ANADOLU ÜNİVERSİTESİ",
-    "program": "Bilgisayar Programcılığı",
     "length": 20
 })
-
 results = search.search()
 ```
 
 ---
 
-## Atlas Classes
+## Atlas Sınıfları
 
 ### `YOKATLASLisansAtlasi(params)`
 
-Fetch detailed information for a specific lisans program.
+Program detaylarını getir.
 
-**Parameters:**
-- `params` (`dict[str, Any]`): Atlas parameters containing `program_id` and `year`
-
-**Methods:**
-
-#### `async fetch_all_details() -> dict[str, Any]`
-Fetch comprehensive program data from all available sources.
-
-**Example:**
 ```python
 import asyncio
 from yokatlas_py import YOKATLASLisansAtlasi
 
-async def get_program_details():
+async def get_details():
     atlas = YOKATLASLisansAtlasi({
-        'program_id': '104111719',  # Program YOP code
+        'program_id': '103910743',
         'year': 2024
     })
-    
-    details = await atlas.fetch_all_details()
-    
-    print(f"Program: {details.get('program_name', 'N/A')}")
-    print(f"University: {details.get('university_name', 'N/A')}")
-    print(f"Faculty: {details.get('faculty_name', 'N/A')}")
-    
-    # Access specific data categories
-    if 'gender_data' in details:
-        print(f"Gender distribution: {details['gender_data']}")
-    
-    if 'score_data' in details:
-        print(f"Score statistics: {details['score_data']}")
+    return await atlas.fetch_all_details()
 
-# Run async function
-asyncio.run(get_program_details())
+data = asyncio.run(get_details())
 ```
 
-**Available Data Categories:**
-- `gender_data`: Gender distribution statistics
-- `score_data`: Score and ranking information
-- `city_data`: Geographic distribution
-- `high_school_data`: High school type statistics
-- `quota_data`: Quota and placement information
-- And 25+ more data categories
+**Dönen Veri Anahtarları (12):**
 
----
+| Anahtar | Açıklama |
+|---------|----------|
+| `genel_bilgiler` | Program, kontenjan, puan bilgileri |
+| `cinsiyet_dagilimi` | Cinsiyet dağılımı |
+| `cografi_bolge_dagilimi` | Coğrafi bölge dağılımı |
+| `lise_grubu_dagilimi` | Lise grubu dağılımı |
+| `lise_bazinda_yerlesen` | Lise bazında yerleşen |
+| `tercih_istatistikleri` | Tercih istatistikleri |
+| `tercih_edilen_programlar` | Tercih edilen programlar |
+| `tercih_edilen_universiteler` | Tercih edilen üniversiteler |
+| `tercih_edilen_program_turleri` | Tercih edilen program türleri |
+| `tercih_edilen_universite_turleri` | Tercih edilen üniversite türleri |
+| `taban_puan_basari_sirasi` | Taban puan ve başarı sırası |
+| `yerlesen_puan_bilgileri` | Yerleşen puan bilgileri |
+
+**Örnek Çıktı:**
+```python
+{
+  "genel_bilgiler": {
+    "program_info": {
+      "ÖSYM Program Kodu": "103910743",
+      "Üniversite": "FIRAT ÜNİVERSİTESİ",
+      "Puan Türü": "SAY"
+    },
+    "kontenjan_info": {
+      "Genel Kontenjan": "53",
+      "Toplam Yerleşen": "60"
+    },
+    "puan_info": {
+      "0,12 Katsayı ile Yerleşen Son Kişinin Puanı": "329,82598"
+    }
+  }
+}
+```
 
 ### `YOKATLASOnlisansAtlasi(params)`
 
-Fetch detailed information for a specific önlisans program.
+Önlisans için aynı yapı (10 veri tipi).
 
-**Parameters:**
-- `params` (`dict[str, Any]`): Atlas parameters containing `program_id` and `year`
-
-**Methods:**
-
-#### `async fetch_all_details() -> dict[str, Any]`
-Fetch comprehensive program data from all available sources.
-
-**Example:**
 ```python
-import asyncio
 from yokatlas_py import YOKATLASOnlisansAtlasi
 
-async def get_onlisans_details():
+async def get_onlisans():
     atlas = YOKATLASOnlisansAtlasi({
-        'program_id': '203550463',  # Önlisans program YOP code
+        'program_id': '105590209',
         'year': 2024
     })
-    
-    details = await atlas.fetch_all_details()
-    return details
-
-# Usage
-details = asyncio.run(get_onlisans_details())
+    return await atlas.fetch_all_details()
 ```
 
 ---
 
-## Search Utilities
+## Fetcher Sınıfları
 
-### `find_best_university_match(name, program_type="lisans")`
+v0.5.4'te eklenen class-based fetcher sistemi.
 
-Find the best matching university name using fuzzy matching.
+### BaseFetcher
 
-**Parameters:**
-- `name` (`str`): University name (partial or abbreviated)
-- `program_type` (`str`, optional): `"lisans"` or `"onlisans"`. Default: `"lisans"`
+Tüm fetcher'ların temel sınıfı.
 
-**Returns:**
-- `str`: Best matching official university name
+```python
+from yokatlas_py.base_fetcher import BaseFetcher
 
-**Example:**
+class CustomFetcher(BaseFetcher):
+    ENDPOINT = "1010.php"
+    PROGRAM_TYPE = "lisans"
+    RESULT_KEY = "custom_data"
+
+    def parse(self, html: str) -> dict:
+        # HTML parse logic
+        pass
+```
+
+### Hazır Fetcher'lar
+
+```python
+from yokatlas_py.fetchers import (
+    # Lisans
+    GenelBilgilerLisansFetcher,
+    CinsiyetDagilimiLisansFetcher,
+    TercihIstatistikleriLisansFetcher,
+    # ... 12 fetcher
+
+    # Önlisans
+    GenelBilgilerOnlisansFetcher,
+    CinsiyetDagilimiOnlisansFetcher,
+    # ... 10 fetcher
+)
+
+# Kullanım
+async def fetch_gender():
+    fetcher = CinsiyetDagilimiLisansFetcher('103910743', 2024)
+    return await fetcher.fetch()
+```
+
+**Tüm Fetcher'lar:**
+
+| Fetcher | Lisans | Önlisans |
+|---------|--------|----------|
+| GenelBilgiler | ✅ | ✅ |
+| CinsiyetDagilimi | ✅ | ✅ |
+| TercihIstatistikleri | ✅ | ✅ |
+| LiseGrubuVeTipiDagilimi | ✅ | ✅ |
+| LiseBazindaYerlesenDagilimi | ✅ | ✅ |
+| SehirVeCografiBolgeDagilimi | ✅ | ✅ |
+| TercihEdilenProgramlar | ✅ | ✅ |
+| TercihEdilenUniversiteler | ✅ | ✅ |
+| TercihEdilenProgramTurleri | ✅ | ✅ |
+| TercihEdilenUniversiteTurleri | ✅ | ✅ |
+| TabanPuanVeBasariSirasiIstatistikleri | ✅ | ✅ |
+| YerlesenBasariSiralari | ✅ | ❌ |
+| YerlesenPuanBilgileri | ✅ | ❌ |
+
+---
+
+## HTTP Client
+
+Singleton HTTP client with connection pooling.
+
+```python
+from yokatlas_py.http_client import YOKATLASClient
+
+# URL oluştur
+url = YOKATLASClient.build_url(
+    program_type="lisans",
+    endpoint="1000_1.php",
+    program_id="103910743",
+    year=2024
+)
+# https://yokatlas.yok.gov.tr/content/lisans-dynamic/1000_1.php?y=103910743
+
+# Client kullan
+async def fetch():
+    client = await YOKATLASClient.get_client()
+    response = await client.get(url)
+    return response.text
+
+# Cleanup
+await YOKATLASClient.close()
+```
+
+**Özellikler:**
+- Connection pooling (max 100 bağlantı)
+- `X-Requested-With: XMLHttpRequest` header
+- `follow_redirects=True`
+- 30 saniye timeout
+
+---
+
+## Arama Yardımcıları
+
+### `find_best_university_match(name, program_type)`
+
 ```python
 from yokatlas_py.search_utils import find_best_university_match
 
-# Fuzzy matching examples
-match1 = find_best_university_match("boğaziçi", "lisans")
-# Returns: "BOĞAZİÇİ ÜNİVERSİTESİ"
+match = find_best_university_match("odtu", "lisans")
+# "ORTA DOĞU TEKNİK ÜNİVERSİTESİ"
 
-match2 = find_best_university_match("odtu", "lisans") 
-# Returns: "ORTA DOĞU TEKNİK ÜNİVERSİTESİ"
-
-match3 = find_best_university_match("itu", "onlisans")
-# Returns: "İSTANBUL TEKNİK ÜNİVERSİTESİ"
+match = find_best_university_match("boun", "lisans")
+# "BOĞAZİÇİ ÜNİVERSİTESİ"
 ```
 
----
+### `expand_program_name(name, program_type)`
 
-### `expand_program_name(name, program_type="lisans")`
-
-Expand a program name to find all related programs.
-
-**Parameters:**
-- `name` (`str`): Program name (partial)
-- `program_type` (`str`, optional): `"lisans"` or `"onlisans"`. Default: `"lisans"`
-
-**Returns:**
-- `list[str]`: List of matching program names
-
-**Example:**
 ```python
 from yokatlas_py.search_utils import expand_program_name
 
-# Find all computer-related programs
 programs = expand_program_name("bilgisayar", "lisans")
-# Returns: ["Bilgisayar Mühendisliği", "Bilgisayar Bilimleri", ...]
-
-# Find tourism programs in önlisans
-tourism_programs = expand_program_name("turizm", "onlisans")
-# Returns: ["Turizm ve Otel İşletmeciliği", "Turizm Animasyonu", ...]
+# ["Bilgisayar Mühendisliği", "Bilgisayar Bilimleri", ...]
 ```
 
----
+### `normalize_search_params(params, program_type)`
 
-### `normalize_search_params(params, program_type="lisans")`
-
-Normalize and validate search parameters.
-
-**Parameters:**
-- `params` (`dict[str, Any]`): Raw search parameters
-- `program_type` (`str`, optional): `"lisans"` or `"onlisans"`. Default: `"lisans"`
-
-**Returns:**
-- `dict[str, Any]`: Normalized parameters
-
-**Example:**
 ```python
 from yokatlas_py.search_utils import normalize_search_params
 
-# Input with various parameter names
-raw_params = {
-    "uni": "boğaziçi",           # Gets normalized to "universite"
-    "bolum": "bilgisayar",       # Gets normalized to "program"
-    "city": "istanbul",          # Gets normalized to "sehir"
-    "score_type": "say"          # Gets normalized to "puan_turu"
-}
-
-normalized = normalize_search_params(raw_params, "lisans")
-# Returns:
-# {
-#     "universite": "BOĞAZİÇİ ÜNİVERSİTESİ",
-#     "program": "bilgisayar",
-#     "sehir": "İSTANBUL",
-#     "puan_turu": "say"
-# }
+normalized = normalize_search_params({
+    "uni": "boğaziçi",
+    "bolum": "bilgisayar"
+}, "lisans")
+# {"universite": "BOĞAZİÇİ ÜNİVERSİTESİ", "program": "bilgisayar"}
 ```
 
 ---
 
-## Pydantic Models
+## Pydantic Modelleri
 
-### `SearchParams`
+### SearchParams
 
-Type-safe search parameter validation.
-
-**Fields:**
-- `puan_turu` (`str`, optional): Score type
-- `universite` (`str`, optional): University name
-- `program` (`str`, optional): Program name
-- `sehir` (`str`, optional): City name
-- `universite_turu` (`str`, optional): University type
-- `ucret` (`str`, optional): Fee type
-- `ogretim_turu` (`str`, optional): Education type
-- `length` (`int`, optional): Results per page
-- `start` (`int`, optional): Start index
-
-**Example:**
 ```python
 from yokatlas_py.models import SearchParams
-from pydantic import ValidationError
 
-try:
-    params = SearchParams(
-        puan_turu="say",
-        universite="Boğaziçi Üniversitesi",
-        length=10,
-        start=0
-    )
-    print(params.model_dump(exclude_none=True))
-except ValidationError as e:
-    print(f"Validation error: {e}")
+params = SearchParams(
+    puan_turu="say",
+    universite="Boğaziçi Üniversitesi",
+    length=10
+)
 ```
 
----
+### ProgramInfo
 
-### `ProgramInfo`
-
-University program information with validation.
-
-**Fields:**
-- `yop_kodu` (`str`): Program code
-- `uni_adi` (`str`): University name
-- `fakulte` (`str`): Faculty name
-- `program_adi` (`str`): Program name
-- `program_detay` (`str`, optional): Program details
-- `sehir_adi` (`str`): City name
-- `universite_turu` (`str`): University type
-- `ucret_burs` (`str`): Fee/scholarship info
-- `ogretim_turu` (`str`): Education type
-- `kontenjan` (`dict`, optional): Quota information
-- `yerlesen` (`dict`, optional): Placement statistics
-- `taban` (`dict`, optional): Base scores
-- `tbs` (`dict`, optional): Success rankings
-
-**Example:**
 ```python
 from yokatlas_py.models import ProgramInfo
 
-# Validate program data
 program = ProgramInfo(
     yop_kodu="104111719",
     uni_adi="BOĞAZİÇİ ÜNİVERSİTESİ",
@@ -432,212 +343,67 @@ program = ProgramInfo(
     ucret_burs="Ücretsiz",
     ogretim_turu="Örgün"
 )
-
-print(f"Program: {program.program_adi}")
-print(f"University: {program.uni_adi}")
 ```
 
 ---
 
-### `YearlyData`
+## Form Verileri
 
-Year-based statistical data validation.
+### Lisans
 
-**Fields:**
-- `year` (`int`): Year
-- `value` (`str` | `int` | `float`): Data value
-
-**Example:**
 ```python
-from yokatlas_py.models import YearlyData
+from yokatlas_py.form_data import UNIVERSITIES, PROGRAMS
 
-yearly_score = YearlyData(year=2024, value=456.78)
-yearly_quota = YearlyData(year=2024, value="50+2+0+0+0")
+print(f"Üniversite: {len(UNIVERSITIES)}")  # 235
+print(f"Program: {len(PROGRAMS)}")          # 200+
+```
+
+### Önlisans
+
+```python
+from yokatlas_py.onlisans_form_data import ONLISANS_UNIVERSITIES, ONLISANS_PROGRAMS
+
+print(f"Üniversite: {len(ONLISANS_UNIVERSITIES)}")  # 176
+print(f"Program: {len(ONLISANS_PROGRAMS)}")          # 250+
 ```
 
 ---
 
-### `ErrorResponse`
-
-Error handling and reporting.
-
-**Fields:**
-- `error` (`str`): Error message
-- `status_code` (`int`, optional): HTTP status code
-- `details` (`dict`, optional): Additional error details
-
----
-
-## Form Data
-
-### `UNIVERSITIES` (from `form_data.py`)
-
-Complete list of 235 lisans universities.
-
-**Example:**
-```python
-from yokatlas_py.form_data import UNIVERSITIES
-
-print(f"Total lisans universities: {len(UNIVERSITIES)}")
-print("First 5:", UNIVERSITIES[:5])
-
-# Check if university exists
-if "BOĞAZİÇİ ÜNİVERSİTESİ" in UNIVERSITIES:
-    print("Boğaziçi University found!")
-```
-
----
-
-### `PROGRAMS` (from `form_data.py`)
-
-Complete list of 200+ lisans programs.
-
-**Example:**
-```python
-from yokatlas_py.form_data import PROGRAMS
-
-# Find computer-related programs
-computer_programs = [p for p in PROGRAMS if "bilgisayar" in p.lower()]
-print(f"Computer programs: {len(computer_programs)}")
-```
-
----
-
-### `ONLISANS_UNIVERSITIES` (from `onlisans_form_data.py`)
-
-Complete list of 176 önlisans universities.
-
-**Example:**
-```python
-from yokatlas_py.onlisans_form_data import ONLISANS_UNIVERSITIES
-
-print(f"Total önlisans universities: {len(ONLISANS_UNIVERSITIES)}")
-```
-
----
-
-### `ONLISANS_PROGRAMS` (from `onlisans_form_data.py`)
-
-Complete list of 250+ önlisans programs.
-
-**Example:**
-```python
-from yokatlas_py.onlisans_form_data import ONLISANS_PROGRAMS
-
-# Find tourism programs
-tourism_programs = [p for p in ONLISANS_PROGRAMS if "turizm" in p.lower()]
-print(f"Tourism programs: {len(tourism_programs)}")
-```
-
----
-
-## Error Handling
-
-### Common Error Types
-
-1. **HTTP Errors**: Network connectivity issues
-2. **Parsing Errors**: Invalid API response format
-3. **Validation Errors**: Invalid parameters with pydantic
-4. **Empty Results**: No programs match search criteria
-
-### Error Handling Examples
+## Hata Yönetimi
 
 ```python
-from yokatlas_py import search_lisans_programs
-from yokatlas_py.models import SearchParams
-from pydantic import ValidationError
-import httpx
+import asyncio
+from yokatlas_py import YOKATLASLisansAtlasi
 
-# Handle validation errors
-try:
-    params = SearchParams(
-        puan_turu="invalid_type",  # Invalid score type
-        length=-5                  # Invalid length
-    )
-except ValidationError as e:
-    print(f"Parameter validation failed: {e}")
-
-# Handle search errors
-try:
-    results = search_lisans_programs({
-        "uni_adi": "nonexistent_university",
-        "program_adi": "nonexistent_program"
+async def safe_fetch():
+    atlas = YOKATLASLisansAtlasi({
+        'program_id': '103910743',
+        'year': 2024
     })
-    
-    if not results:
-        print("No programs found matching your criteria")
-    else:
-        print(f"Found {len(results)} programs")
-        
-except httpx.RequestError as e:
-    print(f"Network error: {e}")
-except Exception as e:
-    print(f"Unexpected error: {e}")
+    result = await atlas.fetch_all_details()
+
+    for key, value in result.items():
+        if isinstance(value, dict) and 'error' in value:
+            print(f"❌ {key}: {value['error']}")
+        else:
+            print(f"✅ {key}")
+
+asyncio.run(safe_fetch())
 ```
 
-### Error Response Format
+**Sık Hatalar:**
 
-```python
-# When API returns an error
-{
-    "error": "HTTP 500: Internal Server Error",
-    "status_code": 500,
-    "details": {
-        "url": "https://yokatlas.yok.gov.tr/...",
-        "method": "POST"
-    }
-}
-```
+| Hata | Sebep |
+|------|-------|
+| `HTTP 418` | Rate limiting |
+| `HTTP 404` | Geçersiz program ID |
+| `Required tables not found` | Veri yok |
 
 ---
 
-## Performance Tips
+## Desteklenen Yıllar
 
-1. **Use Smart Search**: Prefer `search_lisans_programs()` over direct class usage
-2. **Batch Requests**: Use `search_programs()` for both program types
-3. **Limit Results**: Use `length` parameter to control response size
-4. **Cache Universities**: Import form data once and reuse for validation
-5. **Async for Atlas**: Always use `await` with atlas methods
-
-### Example Performance Optimization
-
-```python
-from yokatlas_py import search_programs
-from yokatlas_py.form_data import UNIVERSITIES
-
-# Pre-validate university exists
-def smart_search(uni_name, program_name):
-    # Quick local validation
-    if uni_name.upper() not in [u.upper() for u in UNIVERSITIES]:
-        print(f"University '{uni_name}' not found in database")
-        return []
-    
-    # Perform search
-    return search_programs({
-        "uni_adi": uni_name,
-        "program_adi": program_name,
-        "length": 20  # Limit results for better performance
-    })
-
-results = smart_search("boğaziçi", "bilgisayar")
-```
-
----
-
-## Version Compatibility
-
-- **v0.4.2+**: Full smart search features
-- **v0.4.1+**: Pydantic models and type safety
-- **v0.4.0+**: httpx HTTP client
-- **v0.3.x**: Legacy API (still supported)
-
-**Migration from older versions:**
-```python
-# Old way (v0.3.x)
-from yokatlas_py import YOKATLASLisansTercihSihirbazi
-search = YOKATLASLisansTercihSihirbazi({"universite": "BOĞAZİÇİ ÜNİVERSİTESİ"})
-
-# New way (v0.4.2+) - Recommended
-from yokatlas_py import search_lisans_programs
-results = search_lisans_programs({"uni_adi": "boğaziçi"})
-```
+| Tür | Yıllar |
+|-----|--------|
+| Lisans | 2021, 2022, 2023, 2024 |
+| Önlisans | 2023, 2024 |
