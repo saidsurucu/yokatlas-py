@@ -1,289 +1,314 @@
-
 # YOKATLAS-py
 
-A modern, type-safe Python wrapper for YOKATLAS API with pydantic validation.
+YOKATLAS API için modern, tip güvenli Python kütüphanesi.
 
+[![PyPI version](https://badge.fury.io/py/yokatlas-py.svg)](https://badge.fury.io/py/yokatlas-py)
 [![Python 3.9+](https://img.shields.io/badge/python-3.9+-blue.svg)](https://www.python.org/downloads/)
-[![Type Hints](https://img.shields.io/badge/type%20hints-yes-brightgreen.svg)](https://docs.python.org/3/library/typing.html)
-[![Pydantic](https://img.shields.io/badge/pydantic-2.11+-orange.svg)](https://pydantic.dev)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+[![Downloads](https://pepy.tech/badge/yokatlas-py)](https://pepy.tech/project/yokatlas-py)
 
+> **[English Version](README_EN.md)**
 
-## Installation | Kurulum
+---
 
-**Requirements | Gereksinimler:** Python 3.9+
+## İçindekiler
 
-You can install the package using pip:
+- [Kurulum](#kurulum)
+- [Hızlı Başlangıç](#hızlı-başlangıç)
+- [Desteklenen Veriler](#desteklenen-veriler)
+- [Arama API](#arama-api)
+- [Atlas API](#atlas-api)
+- [Hata Yönetimi](#hata-yönetimi)
+- [Hız Sınırları](#hız-sınırları)
+- [Test](#test)
+- [Katkıda Bulunma](#katkıda-bulunma)
+- [Lisans](#lisans)
 
-Paketi pip kullanarak yükleyebilirsiniz:
+---
 
-```sh
+## Kurulum
+
+**Gereksinimler:** Python 3.9+
+
+```bash
+# pip ile
 pip install yokatlas-py
-```
 
-Or with uv (recommended):
-
-Ya da uv ile (önerilen):
-
-```sh
+# uv ile (önerilen)
 uv add yokatlas-py
 ```
 
-## Features | Özellikler
+---
 
-✅ **Type Safe**: Full type hints and pydantic validation  
-✅ **Modern Python**: Requires Python 3.9+ with modern syntax  
-✅ **Fast HTTP**: Uses httpx for both sync and async operations  
-✅ **Validation**: Runtime validation of all API responses  
-✅ **IDE Support**: Enhanced autocomplete and error detection  
-✅ **Smart Search**: Fuzzy university matching and flexible program name search  
-✅ **Complete Data**: All 235 lisans + 176 önlisans universities with 450+ programs  
-
-## How to | Kullanım
-
-### Quick Start with Smart Search | Akıllı Arama ile Hızlı Başlangıç
+## Hızlı Başlangıç
 
 ```python
-from yokatlas_py import search_lisans_programs, search_onlisans_programs
+from yokatlas_py import search_lisans_programs, YOKATLASLisansAtlasi
+import asyncio
 
-# 🎯 Smart fuzzy search - works with partial names and abbreviations
-# Akıllı bulanık arama - kısmi isimler ve kısaltmalarla çalışır
-
-# Search for bachelor's programs with fuzzy matching
+# 1. Program arama (senkron)
 results = search_lisans_programs({
-    "uni_adi": "boğaziçi",      # Finds "BOĞAZİÇİ ÜNİVERSİTESİ"
-    "program_adi": "bilgisayar", # Finds all computer-related programs
-    "sehir": "istanbul"          # Case-insensitive city matching
-})
-
-print(f"📚 Found {len(results)} lisans programs:")
-for program in results[:3]:
-    print(f"🎓 {program['uni_adi']}")
-    print(f"💻 {program['program_adi']}")
-    print(f"📍 {program['sehir_adi']}")
-    print("---")
-
-# Search for associate programs with abbreviations
-onlisans_results = search_onlisans_programs({
-    "uni_adi": "anadolu",        # Finds "ANADOLU ÜNİVERSİTESİ"
-    "program_adi": "turizm"      # Finds all tourism-related programs
-})
-
-print(f"🏫 Found {len(onlisans_results)} önlisans programs:")
-for program in onlisans_results[:2]:
-    print(f"🎓 {program['uni_adi']}")
-    print(f"🏖️ {program['program_adi']}")
-    print("---")
-```
-
-### Type-Safe Search | Tip Güvenli Arama
-
-```python
-from yokatlas_py import YOKATLASLisansTercihSihirbazi
-from yokatlas_py.models import SearchParams, ProgramInfo
-from pydantic import ValidationError
-
-# Type-safe parameter validation
-params = SearchParams(
-    puan_turu="say",
-    length=10,
-    sehir="İstanbul",
-    universite_turu="Devlet"
-)
-
-# Perform search with validated parameters
-search = YOKATLASLisansTercihSihirbazi(params.model_dump(exclude_none=True))
-results = search.search()
-
-# Process results with validation
-for result in results[:3]:
-    try:
-        program = ProgramInfo(**result)
-        print(f"🎓 {program.uni_adi}")
-        print(f"📚 {program.program_adi}")
-        print(f"🏛️ {program.fakulte}")
-        print(f"📍 {program.sehir_adi}")
-        print("---")
-    except ValidationError as e:
-        print(f"⚠️ Invalid data: {e}")
-```
-
-### Traditional Usage | Geleneksel Kullanım
-
-```python
-from yokatlas_py import (
-    YOKATLASLisansAtlasi,
-    YOKATLASLisansTercihSihirbazi,
-    YOKATLASOnlisansAtlasi,
-    YOKATLASOnlisansTercihSihirbazi
-)
-
-# Atlas classes use async methods
-async def example_atlas_usage():
-    # Lisans (Bachelor's) program details
-    lisans_atlasi = YOKATLASLisansAtlasi({'program_id': '104111719', 'year': 2024})
-    lisans_result = await lisans_atlasi.fetch_all_details()
-    print("YOKATLAS Lisans Atlas Result:", lisans_result)
-    
-    # Önlisans (Associate) program details  
-    onlisans_atlasi = YOKATLASOnlisansAtlasi({'program_id': '203550463', 'year': 2024})
-    onlisans_result = await onlisans_atlasi.fetch_all_details()
-    print("YOKATLAS Önlisans Atlas Result:", onlisans_result)
-
-# Search classes use sync methods
-def example_search_usage():
-    # Search for bachelor's programs
-    lisans_params = {
-        'puan_turu': 'say',          # Score type: say, ea, söz, dil
-        'sehir': 'ANKARA',           # Filter by city
-        'universite_turu': 'Devlet', # State universities only
-        'length': 5                  # Results per page
-    }
-    lisans_search = YOKATLASLisansTercihSihirbazi(lisans_params)
-    lisans_results = lisans_search.search()
-    print("Lisans Search Results:", lisans_results)
-    
-    # Search for associate programs
-    onlisans_params = {
-        'puan_turu': 'tyt',         # Score type for associate degrees
-        'sehir': 'İSTANBUL',        # City filter
-        'universite_turu': 'Devlet', # State universities
-        'length': 10                # Results per page
-    }
-    onlisans_search = YOKATLASOnlisansTercihSihirbazi(onlisans_params)
-    onlisans_results = onlisans_search.search()
-    print("Önlisans Search Results:", onlisans_results)
-
-# Run examples
-example_search_usage()
-
-# For async atlas usage, use asyncio in your environment:
-# import asyncio
-# asyncio.run(example_atlas_usage())
-```
-
-## Pydantic Models | Pydantic Modelleri
-
-The library includes comprehensive pydantic models for type safety and validation:
-
-Kütüphane tip güvenliği ve doğrulama için kapsamlı pydantic modelleri içerir:
-
-### Available Models | Mevcut Modeller
-
-- **SearchParams**: Search parameter validation
-- **ProgramInfo**: University program information  
-- **YearlyData**: Year-based statistical data
-- **ErrorResponse**: Error handling and reporting
-
-### Example with Validation | Doğrulama ile Örnek
-
-```python
-from yokatlas_py.models import SearchParams, ProgramInfo
-from pydantic import ValidationError
-
-# Invalid search parameters will be caught
-try:
-    params = SearchParams(
-        puan_turu="invalid_type",  # Invalid score type
-        length=-5  # Invalid length
-    )
-except ValidationError as e:
-    print(f"Validation error: {e}")
-
-# Valid parameters pass validation
-params = SearchParams(
-    puan_turu="say",
-    sehir="İstanbul", 
-    length=10
-)
-```
-
-## Smart Search Features | Akıllı Arama Özellikleri
-
-### Fuzzy University Matching | Bulanık Üniversite Eşleştirme
-
-The library automatically matches partial and abbreviated university names:
-
-```python
-from yokatlas_py import search_lisans_programs
-
-# All of these work and find "BOĞAZİÇİ ÜNİVERSİTESİ"
-search_lisans_programs({"uni_adi": "boğaziçi"})
-search_lisans_programs({"uni_adi": "bogazici"})  # Without Turkish chars
-search_lisans_programs({"uni_adi": "boun"})      # Common abbreviation
-
-# Common university abbreviations supported:
-# "odtu"/"metu" → "ORTA DOĞU TEKNİK ÜNİVERSİTESİ"
-# "itu" → "İSTANBUL TEKNİK ÜNİVERSİTESİ" 
-# "hacettepe" → "HACETTEPE ÜNİVERSİTESİ"
-```
-
-### Flexible Program Matching | Esnek Program Eşleştirme
-
-Partial program names automatically find all related programs:
-
-```python
-# "bilgisayar" finds all computer-related programs:
-# - "Bilgisayar Mühendisliği"
-# - "Bilgisayar Bilimleri" 
-# - "Bilgisayar ve Öğretim Teknolojileri Öğretmenliği"
-
-results = search_lisans_programs({"program_adi": "bilgisayar"})
-
-# "mühendislik" finds all engineering programs
-engineering_programs = search_lisans_programs({"program_adi": "mühendislik"})
-```
-
-### Universal Search | Evrensel Arama
-
-Search both lisans and önlisans programs simultaneously:
-
-```python
-from yokatlas_py import search_programs
-
-# Search both program types at once
-all_results = search_programs({
-    "uni_adi": "anadolu",
+    "uni_adi": "boğaziçi",       # Bulanık eşleştirme!
     "program_adi": "bilgisayar"
 })
+print(f"{len(results)} program bulundu")
 
-print(f"Lisans programs: {len(all_results['lisans'])}")
-print(f"Önlisans programs: {len(all_results['onlisans'])}")
+# 2. Detaylı program verisi (asenkron)
+async def detay_getir():
+    atlas = YOKATLASLisansAtlasi({
+        'program_id': '103910743',
+        'year': 2024
+    })
+    return await atlas.fetch_all_details()
+
+detaylar = asyncio.run(detay_getir())
+print(detaylar['genel_bilgiler'])
 ```
 
-## Migration from v0.3.x | v0.3.x'den Geçiş
+---
 
-### New Features in v0.4.2+ | v0.4.2+'daki Yeni Özellikler
+## Desteklenen Veriler
 
-- **Smart Search**: Use `search_lisans_programs()` and `search_onlisans_programs()` for better search experience
-- **Fuzzy Matching**: University and program names are matched intelligently
-- **Complete Data**: All Turkish universities and programs included
+### Desteklenen Yıllar
 
-### Migration Steps | Geçiş Adımları
+| Program Türü | Yıllar |
+|--------------|--------|
+| Lisans | 2021, 2022, 2023, 2024 |
+| Önlisans | 2023, 2024 |
 
-1. **Update the package**
-   ```bash
-   pip install --upgrade yokatlas-py
-   ```
+### Lisans Veri Tipleri (12)
 
-2. **Use new smart search functions (recommended)**
-   ```python
-   # Old way (still works)
-   from yokatlas_py import YOKATLASLisansTercihSihirbazi
-   search = YOKATLASLisansTercihSihirbazi({"universite": "BOĞAZİÇİ ÜNİVERSİTESİ"})
-   
-   # New way (with fuzzy matching)
-   from yokatlas_py import search_lisans_programs
-   results = search_lisans_programs({"uni_adi": "boğaziçi"})  # Much easier!
-   ```
+| Anahtar | Açıklama |
+|---------|----------|
+| `genel_bilgiler` | Genel bilgi, kontenjan, puan bilgileri |
+| `cinsiyet_dagilimi` | Cinsiyet dağılımı |
+| `cografi_bolge_dagilimi` | Coğrafi bölge dağılımı |
+| `lise_grubu_dagilimi` | Lise grubu dağılımı |
+| `lise_bazinda_yerlesen` | Lise bazında yerleşen sayıları |
+| `tercih_istatistikleri` | Tercih istatistikleri |
+| `tercih_edilen_programlar` | Tercih edilen diğer programlar |
+| `tercih_edilen_universiteler` | Tercih edilen üniversiteler |
+| `tercih_edilen_program_turleri` | Tercih edilen program türleri |
+| `tercih_edilen_universite_turleri` | Tercih edilen üniversite türleri |
+| `taban_puan_basari_sirasi` | Taban puan ve başarı sırası istatistikleri |
+| `yerlesen_puan_bilgileri` | Yerleşenlerin puan bilgileri |
 
-3. **Optional: Use type-safe features**
-   ```python
-   from yokatlas_py.models import SearchParams
-   params = SearchParams(puan_turu="say", length=10)
-   ```
+### Önlisans Veri Tipleri (10)
 
-## License | Lisans
+Lisans ile aynı, sadece `yerlesen_basari_siralari` ve `yerlesen_puan_bilgileri` lisansa özeldir.
 
-This project is licensed under the MIT License - see the LICENSE file for details.
+---
 
-Bu proje MIT Lisansı ile lisanslanmıştır - detaylar için LICENSE dosyasına bakınız.
+## Arama API
+
+### Akıllı Arama (Bulanık Eşleştirme)
+
+```python
+from yokatlas_py import search_lisans_programs, search_onlisans_programs, search_programs
+
+# Bulanık üniversite eşleştirme - hepsi "BOĞAZİÇİ ÜNİVERSİTESİ"ni bulur
+search_lisans_programs({"uni_adi": "boğaziçi"})
+search_lisans_programs({"uni_adi": "bogazici"})  # Türkçe karakter olmadan
+search_lisans_programs({"uni_adi": "boun"})      # Kısaltma
+
+# Desteklenen kısaltmalar:
+# "odtü", "odtu", "metu" → ORTA DOĞU TEKNİK ÜNİVERSİTESİ
+# "itü", "itu" → İSTANBUL TEKNİK ÜNİVERSİTESİ
+# "hacettepe" → HACETTEPE ÜNİVERSİTESİ
+
+# Kısmi program adı eşleştirme
+results = search_lisans_programs({"program_adi": "bilgisayar"})
+# Bulur: Bilgisayar Mühendisliği, Bilgisayar Bilimleri, vb.
+
+# Hem lisans hem önlisans arama
+tum_sonuclar = search_programs({"uni_adi": "anadolu"})
+print(f"Lisans: {len(tum_sonuclar['lisans'])}")
+print(f"Önlisans: {len(tum_sonuclar['onlisans'])}")
+```
+
+### Geleneksel Arama
+
+```python
+from yokatlas_py import YOKATLASLisansTercihSihirbazi, YOKATLASOnlisansTercihSihirbazi
+
+# Lisans arama
+lisans_arama = YOKATLASLisansTercihSihirbazi({
+    'puan_turu': 'say',          # say, ea, söz, dil
+    'sehir': 'ANKARA',
+    'universite_turu': 'Devlet',
+    'ust_bs': 50000,             # Maksimum başarı sırası
+    'length': 10
+})
+sonuclar = lisans_arama.search()
+
+# Önlisans arama
+onlisans_arama = YOKATLASOnlisansTercihSihirbazi({
+    'puan_turu': 'tyt',
+    'sehir': 'İSTANBUL',
+    'length': 10
+})
+sonuclar = onlisans_arama.search()
+```
+
+---
+
+## Atlas API
+
+### Tüm Program Detaylarını Getirme
+
+```python
+import asyncio
+from yokatlas_py import YOKATLASLisansAtlasi, YOKATLASOnlisansAtlasi
+
+async def program_verisi_getir():
+    # Lisans
+    lisans = YOKATLASLisansAtlasi({
+        'program_id': '103910743',
+        'year': 2024
+    })
+    veri = await lisans.fetch_all_details()
+    return veri
+
+sonuc = asyncio.run(program_verisi_getir())
+```
+
+### Örnek Çıktı
+
+```python
+# sonuc['genel_bilgiler']
+{
+  "program_info": {
+    "ÖSYM Program Kodu": "103910743",
+    "Üniversite Türü": "Devlet",
+    "Üniversite": "FIRAT ÜNİVERSİTESİ",
+    "Fakülte / Yüksekokul": "Teknoloji Fakültesi",
+    "Puan Türü": "SAY",
+    "Burs Türü": "Ücretsiz"
+  },
+  "kontenjan_info": {
+    "Genel Kontenjan": "53",
+    "Toplam Yerleşen": "60",
+    "Boş Kalan Kontenjan": "0",
+    "İlk Yerleşme Oranı": "100"
+  },
+  "puan_info": {
+    "0,12 Katsayı ile Yerleşen Son Kişinin Puanı": "329,82598",
+    "0,12 Katsayı ile Yerleşen Son Kişinin Başarı Sırası": "218.206"
+  }
+}
+```
+
+### Sadece Belirli Verileri Getirme
+
+```python
+async def belirli_veri_getir():
+    atlas = YOKATLASLisansAtlasi({
+        'program_id': '103910743',
+        'year': 2024,
+        'keys': ['genel_bilgiler', 'cinsiyet_dagilimi']  # Sadece bunlar
+    })
+    return await atlas.fetch_all_details()
+```
+
+---
+
+## Hata Yönetimi
+
+```python
+import asyncio
+from yokatlas_py import YOKATLASLisansAtlasi
+
+async def guvenli_getir():
+    atlas = YOKATLASLisansAtlasi({
+        'program_id': '999999999',  # Geçersiz ID
+        'year': 2024
+    })
+    sonuc = await atlas.fetch_all_details()
+
+    # Her veri tipi için hata kontrolü
+    for anahtar, deger in sonuc.items():
+        if isinstance(deger, dict) and 'error' in deger:
+            print(f"❌ {anahtar}: {deger['error']}")
+        else:
+            print(f"✅ {anahtar}: OK")
+
+asyncio.run(guvenli_getir())
+```
+
+### Sık Karşılaşılan Hatalar
+
+| Hata | Sebep | Çözüm |
+|------|-------|-------|
+| `HTTP 418` | Hız sınırı | Bekleyip tekrar deneyin |
+| `HTTP 404` | Geçersiz program ID veya yıl | program_id'yi doğrulayın |
+| `Required tables not found` | Bu program için veri yok | Normal - bazı programlarda belirli veriler olmayabilir |
+
+---
+
+## Hız Sınırları
+
+YOKATLAS API'nin hız sınırları vardır. Öneriler:
+
+- İstekler arası gecikme ekleyin: `await asyncio.sleep(0.5)`
+- Bağlantı havuzu kullanın (`YOKATLASClient` ile otomatik)
+- Sonuçları mümkünse önbelleğe alın
+- Aynı endpoint'e paralel isteklerden kaçının
+
+```python
+import asyncio
+
+async def birden_fazla_program_getir(program_idleri):
+    sonuclar = {}
+    for pid in program_idleri:
+        atlas = YOKATLASLisansAtlasi({'program_id': pid, 'year': 2024})
+        sonuclar[pid] = await atlas.fetch_all_details()
+        await asyncio.sleep(0.5)  # Hız sınırı gecikmesi
+    return sonuclar
+```
+
+---
+
+## Test
+
+```bash
+# Unit testleri çalıştır
+uv run pytest tests/ -v
+
+# Coverage ile çalıştır
+uv run pytest tests/ --cov=yokatlas_py
+
+# Gerçek API testi (internet gerektirir)
+uv run python -c "
+from yokatlas_py import search_lisans_programs
+sonuclar = search_lisans_programs({'uni_adi': 'boğaziçi', 'length': 3})
+print(f'{len(sonuclar)} program bulundu')
+"
+```
+
+---
+
+## Katkıda Bulunma
+
+Katkılarınızı bekliyoruz!
+
+1. Repository'yi fork edin
+2. Feature branch oluşturun: `git checkout -b feature/harika-ozellik`
+3. Değişikliklerinizi yapın
+4. Testleri çalıştırın: `uv run pytest tests/`
+5. Commit edin: `git commit -m 'Harika özellik eklendi'`
+6. Push edin: `git push origin feature/harika-ozellik`
+7. Pull Request açın
+
+---
+
+## Lisans
+
+MIT Lisansı - detaylar için [LICENSE](LICENSE) dosyasına bakın.
+
+---
+
+## Bağlantılar
+
+- [PyPI Paketi](https://pypi.org/project/yokatlas-py/)
+- [YOKATLAS Resmi](https://yokatlas.yok.gov.tr/)
+- [Hata Bildirimi](https://github.com/your-username/yokatlas-py/issues)

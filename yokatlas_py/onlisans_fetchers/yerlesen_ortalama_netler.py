@@ -1,13 +1,21 @@
-import httpx
-from bs4 import BeautifulSoup
-import asyncio
-from typing import Any, Optional, Union
-from yokatlas_py.config import settings
+"""
+Yerlesen Ortalama Netler (Placement Average Scores) Fetcher for Onlisans Programs.
+
+This module provides backward-compatible function interface that delegates
+to the new class-based fetcher.
+
+Note: This is a wrapper for backward compatibility.
+      New code should use YerlesenOrtalamaNetlerOnlisansFetcher directly.
+"""
+
+from typing import Any
+
+from ..fetchers.yerlesen_ortalama_netler import YerlesenOrtalamaNetlerOnlisansFetcher
 
 
 async def fetch_yerlesen_ortalama_netler(program_id: str, year: int) -> dict[str, Any]:
     """
-    Fetch data for a specific program and year.
+    Fetch placement average scores data for an onlisans program.
 
     Args:
         program_id: YÖK program kodu (9 digit string)
@@ -16,53 +24,5 @@ async def fetch_yerlesen_ortalama_netler(program_id: str, year: int) -> dict[str
     Returns:
         Dictionary containing fetched data or error message
     """
-    if year not in settings.supported_years:
-        return {
-            "error": f"Invalid year. Only {settings.supported_years} are supported."
-        }
-
-    base_url = "https://yokatlas.yok.gov.tr"
-    url_suffix = (
-        f"/{year}/content/onlisans-dynamic/3210a.php?y={program_id}"
-        if year != 2024
-        else f"/content/onlisans-dynamic/3210a.php?y={program_id}"
-    )
-    url = f"{base_url}{url_suffix}"
-
-    headers = {
-        "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36"
-    }
-
-    async with httpx.AsyncClient(verify=False) as client:
-        try:
-            response = await client.get(url, headers=headers)
-            response.raise_for_status()
-            html_content = response.text
-        except httpx.RequestError as e:
-            return {"error": f"Failed to fetch data from YOKATLAS: {str(e)}"}
-
-    soup = BeautifulSoup(html_content.replace("---", "0"), "html.parser")
-    table = soup.find("table", {"class": "table table-bordered"})
-
-    if not table:
-        return {"error": "Table not found in the HTML content"}
-
-    # Initialize result dictionary dynamically
-    result = {}
-    headers = [header.get_text(strip=True) for header in table.find_all("th")]
-
-    for header in headers[1:]:
-        result[header] = {}
-
-    rows = table.find_all("tr")
-    for row in rows[1:]:  # Skip the first header row
-        cols = row.find_all("td")
-        if len(cols) == len(headers):
-            key = cols[0].get_text(strip=True)
-            for i, header in enumerate(headers[1:], start=1):
-                value = cols[i].get_text(strip=True).replace(",", ".")
-                try:
-                    result[header][key] = float(value)
-                except ValueError:
-                    result[header][key] = value
-    return result
+    fetcher = YerlesenOrtalamaNetlerOnlisansFetcher(program_id, year)
+    return await fetcher.fetch()

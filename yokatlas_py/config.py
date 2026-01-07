@@ -93,33 +93,3 @@ class YOKATLASSettings(BaseSettings):
 
 # Global settings instance
 settings = YOKATLASSettings()
-
-
-class HTTPClientConfig(BaseSettings):
-    """HTTP client specific configuration"""
-
-    connection_timeout: int = Field(10, ge=1, description="Connection timeout")
-    read_timeout: int = Field(30, ge=1, description="Read timeout")
-    max_connections: int = Field(100, ge=1, description="Max connection pool size")
-    max_keepalive_connections: int = Field(
-        20, ge=1, description="Max keepalive connections"
-    )
-
-    model_config = {"env_prefix": "YOKATLAS_HTTP_", "extra": "ignore"}
-
-
-class LoggingConfig(BaseSettings):
-    """Logging configuration"""
-
-    level: str = Field("INFO", description="Log level")
-    format: str = Field(
-        "%(asctime)s - %(name)s - %(levelname)s - %(message)s", description="Log format"
-    )
-    enable_debug: bool = Field(False, description="Enable debug logging")
-
-    model_config = {"env_prefix": "YOKATLAS_LOG_", "extra": "ignore"}
-
-
-# Configuration instances
-http_config = HTTPClientConfig()
-logging_config = LoggingConfig()

@@ -1,6 +1,6 @@
 [project]
 name = "yokatlas-py"
-version = "0.5.3"
+version = "0.5.4"
 description = "A python wrapper for YOKATLAS API"
 readme = "README.md"
 requires-python = ">=3.9"
@@ -52,7 +52,8 @@ build-backend = "setuptools.build_meta"
 [tool.setuptools]
 packages = [
     "yokatlas_py",
-    "yokatlas_py.lisans_fetchers", 
+    "yokatlas_py.fetchers",
+    "yokatlas_py.lisans_fetchers",
     "yokatlas_py.onlisans_fetchers"
 ]
 
@@ -91,6 +92,7 @@ testpaths = [
     "tests",
 ]
 asyncio_mode = "auto"
+asyncio_default_fixture_loop_scope = "function"
 
 [tool.coverage.run]
 source = ["yokatlas_py"]
@@ -107,4 +109,10 @@ exclude_lines = [
     "if __name__ == .__main__.:",
     "class .*\\bProtocol\\):",
     "@\\(abc\\.\\)?abstractmethod",
+]
+
+[dependency-groups]
+dev = [
+    "pytest>=8.3.5",
+    "pytest-asyncio>=0.24.0",
 ]
