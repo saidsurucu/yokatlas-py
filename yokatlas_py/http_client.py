@@ -89,6 +89,9 @@ class YOKATLASClient:
         except Exception:
             raise
 
+    # The "current" year on YOKATLAS that doesn't require year prefix in URL
+    CURRENT_YEAR: ClassVar[int] = 2025
+
     @classmethod
     def build_url(
         cls,
@@ -100,7 +103,8 @@ class YOKATLASClient:
         """
         Build URL with proper year handling.
 
-        YOKATLAS has a special case: 2024 URLs don't include the year in path.
+        YOKATLAS has a special case: the current year's URLs don't include the year in path.
+        As of 2025, the current year is 2025.
 
         Args:
             program_type: "lisans" or "onlisans"
@@ -112,17 +116,17 @@ class YOKATLASClient:
             Complete URL string
 
         Examples:
-            >>> YOKATLASClient.build_url("lisans", "1010.php", "123456789", 2024)
+            >>> YOKATLASClient.build_url("lisans", "1010.php", "123456789", 2025)
             'https://yokatlas.yok.gov.tr/content/lisans-dynamic/1010.php?y=123456789'
 
-            >>> YOKATLASClient.build_url("lisans", "1010.php", "123456789", 2023)
-            'https://yokatlas.yok.gov.tr/2023/content/lisans-dynamic/1010.php?y=123456789'
+            >>> YOKATLASClient.build_url("lisans", "1010.php", "123456789", 2024)
+            'https://yokatlas.yok.gov.tr/2024/content/lisans-dynamic/1010.php?y=123456789'
         """
         # Map program type to URL path segment
         path_segment = f"{program_type}-dynamic"
 
-        # 2024 is the "current" year without year prefix in URL
-        if year == 2024:
+        # Current year doesn't have year prefix in URL
+        if year == cls.CURRENT_YEAR:
             url_path = f"/content/{path_segment}/{endpoint}?y={program_id}"
         else:
             url_path = f"/{year}/content/{path_segment}/{endpoint}?y={program_id}"
