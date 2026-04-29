@@ -1,26 +1,65 @@
-from .lisansatlasi import YOKATLASLisansAtlasi
-from .lisanstercihsihirbazi import YOKATLASLisansTercihSihirbazi
-from .onlisansatlasi import YOKATLASOnlisansAtlasi
-from .onlisanstercihsihirbazi import YOKATLASOnlisansTercihSihirbazi
+"""yokatlas-py — Python client for the YÖK Atlas tercih kılavuzu JSON API."""
 
-# Import models and configuration for type hints
-from . import models, config
+from __future__ import annotations
 
-# Import enhanced search functions
-from .search_wrappers import (
-    search_lisans_programs,
-    search_onlisans_programs,
-    search_programs
+from .client import (
+    AsyncYokAtlasClient,
+    YokAtlasClient,
+    get_program,
+    list_cities,
+    list_program_groups,
+    list_universities,
+    search_programs,
+)
+from .config import Settings, settings
+from .exceptions import (
+    APIError,
+    LookupError,
+    NotFoundError,
+    RateLimitError,
+    YokAtlasError,
+)
+from .models import (
+    City,
+    Program,
+    ProgramGroup,
+    PuanTuru,
+    SearchFilters,
+    SearchPage,
+    University,
+    YearlyStats,
 )
 
+__version__ = "1.0.0"
+
 __all__ = [
-    'YOKATLASLisansAtlasi',
-    'YOKATLASLisansTercihSihirbazi',
-    'YOKATLASOnlisansAtlasi',
-    'YOKATLASOnlisansTercihSihirbazi',
-    'models',
-    'config',
-    'search_lisans_programs',
-    'search_onlisans_programs',
-    'search_programs'
+    # Clients
+    "AsyncYokAtlasClient",
+    "YokAtlasClient",
+    # Convenience
+    "get_program",
+    "list_cities",
+    "list_program_groups",
+    "list_universities",
+    "search_programs",
+    # Models
+    "City",
+    "Program",
+    "ProgramGroup",
+    "PuanTuru",
+    "SearchFilters",
+    "SearchPage",
+    "University",
+    "YearlyStats",
+    # Configuration
+    "Settings",
+    "settings",
+    # Exceptions
+    "APIError",
+    "LookupError",
+    "NotFoundError",
+    "RateLimitError",
+    "YokAtlasError",
+    # Version
+    "__version__",
 ]

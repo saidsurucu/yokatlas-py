@@ -1,152 +1,139 @@
-"""
-Shared HTTP client with connection pooling for YOKATLAS API requests.
+"""HTTP transport layer for the YÖK Atlas JSON API.
 
-This module provides a centralized HTTP client configuration to:
-- Avoid creating new connections for each fetcher
-- Maintain consistent timeout, SSL, and header settings
-- Provide URL building utilities with proper year handling
+Provides a thin wrapper around ``httpx`` with retries, JSON serialization,
+and unified error handling for both sync and async use.
 """
 
-from typing import Optional, ClassVar
+from __future__ import annotations
+
+import json
+from typing import Any
+
 import httpx
-from contextlib import asynccontextmanager
+
+from .config import Settings, settings as default_settings
+from .exceptions import APIError, NotFoundError, RateLimitError
 
 
-class YOKATLASClient:
-    """
-    Singleton-style HTTP client for YOKATLAS API requests.
+def _build_limits() -> httpx.Limits:
+    return httpx.Limits(max_connections=100, max_keepalive_connections=20)
 
-    Provides connection pooling and consistent configuration across all fetchers.
 
-    Usage:
-        client = await YOKATLASClient.get_client()
-        response = await client.get(url)
+def _raise_for_response(response: httpx.Response) -> None:
+    if response.is_success:
+        return
+    body: str | None
+    try:
+        body = response.text
+    except Exception:  # pragma: no cover
+        body = None
+    msg = f"YÖK Atlas API error {response.status_code} for {response.request.url}"
+    if response.status_code == 404:
+        raise NotFoundError(msg, status_code=response.status_code, body=body)
+    if response.status_code in (418, 429):
+        raise RateLimitError(msg, status_code=response.status_code, body=body)
+    raise APIError(msg, status_code=response.status_code, body=body)
 
-        # Or using context manager for automatic cleanup:
-        async with YOKATLASClient.session() as client:
-            response = await client.get(url)
-    """
 
-    # Class-level client instance
-    _client: ClassVar[Optional[httpx.AsyncClient]] = None
+def _decode_json(response: httpx.Response) -> Any:
+    try:
+        return response.json()
+    except json.JSONDecodeError as exc:
+        raise APIError(
+            f"Failed to decode JSON from {response.request.url}: {exc}",
+            status_code=response.status_code,
+            body=response.text[:500] if response.text else None,
+        ) from exc
 
-    # Configuration constants
-    BASE_URL: ClassVar[str] = "https://yokatlas.yok.gov.tr"
-    TIMEOUT: ClassVar[int] = 30
-    VERIFY_SSL: ClassVar[bool] = False
 
-    DEFAULT_HEADERS: ClassVar[dict[str, str]] = {
-        "User-Agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/18.0 Safari/605.1.15",
-        "Accept": "text/html, */*; q=0.01",
-        "Accept-Language": "tr-TR,tr;q=0.9",
-        "X-Requested-With": "XMLHttpRequest",
-    }
+class HttpClient:
+    """Synchronous JSON HTTP client over :class:`httpx.Client`."""
 
-    @classmethod
-    async def get_client(cls) -> httpx.AsyncClient:
-        """
-        Get or create the shared client instance.
-
-        Returns:
-            httpx.AsyncClient: The shared HTTP client instance
-        """
-        if cls._client is None or cls._client.is_closed:
-            cls._client = httpx.AsyncClient(
-                verify=cls.VERIFY_SSL,
-                timeout=httpx.Timeout(cls.TIMEOUT),
-                headers=cls.DEFAULT_HEADERS,
+    def __init__(self, *, settings: Settings | None = None, client: httpx.Client | None = None) -> None:
+        self.settings = settings or default_settings
+        if client is None:
+            transport = httpx.HTTPTransport(retries=self.settings.max_retries, verify=self.settings.verify_ssl)
+            client = httpx.Client(
+                base_url=str(self.settings.base_url).rstrip("/"),
+                timeout=self.settings.timeout,
+                headers=self.settings.headers(),
+                limits=_build_limits(),
+                transport=transport,
                 follow_redirects=True,
-                limits=httpx.Limits(
-                    max_connections=100,
-                    max_keepalive_connections=20,
-                ),
             )
-        return cls._client
-
-    @classmethod
-    async def close(cls) -> None:
-        """Close the client connection and release resources."""
-        if cls._client is not None and not cls._client.is_closed:
-            await cls._client.aclose()
-            cls._client = None
-
-    @classmethod
-    @asynccontextmanager
-    async def session(cls):
-        """
-        Context manager for HTTP client usage.
-
-        Note: Does NOT close the client on exit to allow connection reuse.
-        Use close() explicitly when shutting down the application.
-
-        Usage:
-            async with YOKATLASClient.session() as client:
-                response = await client.get(url)
-        """
-        client = await cls.get_client()
-        try:
-            yield client
-        except Exception:
-            raise
-
-    # The "current" year on YOKATLAS that doesn't require year prefix in URL
-    CURRENT_YEAR: ClassVar[int] = 2025
-
-    @classmethod
-    def build_url(
-        cls,
-        program_type: str,
-        endpoint: str,
-        program_id: str,
-        year: int,
-    ) -> str:
-        """
-        Build URL with proper year handling.
-
-        YOKATLAS has a special case: the current year's URLs don't include the year in path.
-        As of 2025, the current year is 2025.
-
-        Args:
-            program_type: "lisans" or "onlisans"
-            endpoint: PHP endpoint (e.g., "1010.php", "2050.php")
-            program_id: YÖK program kodu (9 digit string)
-            year: Year (2022-2025)
-
-        Returns:
-            Complete URL string
-
-        Examples:
-            >>> YOKATLASClient.build_url("lisans", "1010.php", "123456789", 2025)
-            'https://yokatlas.yok.gov.tr/content/lisans-dynamic/1010.php?y=123456789'
-
-            >>> YOKATLASClient.build_url("lisans", "1010.php", "123456789", 2024)
-            'https://yokatlas.yok.gov.tr/2024/content/lisans-dynamic/1010.php?y=123456789'
-        """
-        # Map program type to URL path segment
-        path_segment = f"{program_type}-dynamic"
-
-        # Current year doesn't have year prefix in URL
-        if year == cls.CURRENT_YEAR:
-            url_path = f"/content/{path_segment}/{endpoint}?y={program_id}"
+            self._owns_client = True
         else:
-            url_path = f"/{year}/content/{path_segment}/{endpoint}?y={program_id}"
+            self._owns_client = False
+        self._client = client
 
-        return f"{cls.BASE_URL}{url_path}"
+    @property
+    def client(self) -> httpx.Client:
+        return self._client
 
-    @classmethod
-    def build_search_url(cls, program_type: str) -> str:
-        """
-        Build search endpoint URL.
+    def get_json(self, path: str, *, params: dict[str, Any] | None = None) -> Any:
+        response = self._client.get(path, params=params)
+        _raise_for_response(response)
+        return _decode_json(response)
 
-        Args:
-            program_type: "lisans" or "onlisans"
+    def post_json(self, path: str, *, json_body: dict[str, Any]) -> Any:
+        response = self._client.post(path, json=json_body)
+        _raise_for_response(response)
+        return _decode_json(response)
 
-        Returns:
-            Search endpoint URL
-        """
-        if program_type == "lisans":
-            endpoint = "server_processing-atlas2016-TS-t4.php"
+    def close(self) -> None:
+        if self._owns_client and not self._client.is_closed:
+            self._client.close()
+
+    def __enter__(self) -> "HttpClient":
+        return self
+
+    def __exit__(self, *exc: Any) -> None:
+        self.close()
+
+
+class AsyncHttpClient:
+    """Asynchronous JSON HTTP client over :class:`httpx.AsyncClient`."""
+
+    def __init__(self, *, settings: Settings | None = None, client: httpx.AsyncClient | None = None) -> None:
+        self.settings = settings or default_settings
+        if client is None:
+            transport = httpx.AsyncHTTPTransport(retries=self.settings.max_retries, verify=self.settings.verify_ssl)
+            client = httpx.AsyncClient(
+                base_url=str(self.settings.base_url).rstrip("/"),
+                timeout=self.settings.timeout,
+                headers=self.settings.headers(),
+                limits=_build_limits(),
+                transport=transport,
+                follow_redirects=True,
+            )
+            self._owns_client = True
         else:
-            endpoint = "server_processing-atlas2016-MTS-t4.php"
+            self._owns_client = False
+        self._client = client
 
-        return f"{cls.BASE_URL}/server_side/{endpoint}"
+    @property
+    def client(self) -> httpx.AsyncClient:
+        return self._client
+
+    async def get_json(self, path: str, *, params: dict[str, Any] | None = None) -> Any:
+        response = await self._client.get(path, params=params)
+        _raise_for_response(response)
+        return _decode_json(response)
+
+    async def post_json(self, path: str, *, json_body: dict[str, Any]) -> Any:
+        response = await self._client.post(path, json=json_body)
+        _raise_for_response(response)
+        return _decode_json(response)
+
+    async def aclose(self) -> None:
+        if self._owns_client and not self._client.is_closed:
+            await self._client.aclose()
+
+    async def __aenter__(self) -> "AsyncHttpClient":
+        return self
+
+    async def __aexit__(self, *exc: Any) -> None:
+        await self.aclose()
+
+
+__all__ = ["AsyncHttpClient", "HttpClient"]

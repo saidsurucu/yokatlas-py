@@ -1,21 +1,21 @@
 [project]
 name = "yokatlas-py"
-version = "0.5.5"
-description = "A python wrapper for YOKATLAS API"
+version = "1.0.0"
+description = "Python client for the YÖK Atlas tercih kılavuzu JSON API"
 readme = "README.md"
-requires-python = ">=3.9"
+requires-python = ">=3.10"
 license = "MIT"
 authors = [{name = "Said Sürücü", email = "saidsrc@gmail.com"}]
 keywords = ["yokatlas", "turkish-education", "university", "yok", "higher-education", "turkey", "api"]
 classifiers = [
-    "Development Status :: 4 - Beta",
+    "Development Status :: 5 - Production/Stable",
     "Intended Audience :: Developers",
     "Intended Audience :: Education",
     "Programming Language :: Python :: 3",
-    "Programming Language :: Python :: 3.9",
     "Programming Language :: Python :: 3.10",
     "Programming Language :: Python :: 3.11",
     "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: 3.13",
     "Topic :: Software Development :: Libraries :: Python Modules",
     "Topic :: Education",
     "Operating System :: OS Independent",
@@ -23,26 +23,17 @@ classifiers = [
 urls = {Homepage = "https://github.com/saidsurucu/yokatlas-py", Issues = "https://github.com/saidsurucu/yokatlas-py/issues"}
 dependencies = [
     "httpx>=0.28.1",
-    "urllib3>=1.26.0",
-    "beautifulsoup4>=4.9.0",
-    "pydantic==2.11.7",
+    "pydantic>=2.7,<3",
     "pydantic-settings>=2.0.0",
-    "typing-extensions>=4.0.0"
 ]
 
 [project.optional-dependencies]
 dev = [
-    "pytest>=6.0",
-    "pytest-asyncio>=0.18.0",
-    "pytest-cov>=2.10.0",
-    "black>=21.0.0",
-    "flake8>=3.8.0",
-    "mypy>=0.800"
-]
-test = [
-    "pytest>=6.0",
-    "pytest-asyncio>=0.18.0",
-    "responses>=0.18.0"
+    "pytest>=8.0",
+    "pytest-asyncio>=0.24",
+    "pytest-cov>=4.0",
+    "black>=24.0",
+    "mypy>=1.8",
 ]
 
 [build-system]
@@ -50,49 +41,27 @@ requires = ["setuptools>=61.0", "wheel"]
 build-backend = "setuptools.build_meta"
 
 [tool.setuptools]
-packages = [
-    "yokatlas_py",
-    "yokatlas_py.fetchers",
-    "yokatlas_py.lisans_fetchers",
-    "yokatlas_py.onlisans_fetchers"
-]
-
-[tool.setuptools.package-data]
-yokatlas_py = ["columnData.json"]
+packages = ["yokatlas_py"]
 
 [tool.black]
-line-length = 88
-target-version = ['py39']
-include = '\.pyi?$'
-extend-exclude = '''
-/(
-  # directories
-  \.eggs
-  | \.git
-  | \.hg
-  | \.mypy_cache
-  | \.tox
-  | \.venv
-  | build
-  | dist
-)/
-'''
+line-length = 100
+target-version = ['py310']
 
 [tool.mypy]
-python_version = "3.9"
+python_version = "3.10"
 warn_return_any = true
 warn_unused_configs = true
-disallow_untyped_defs = true
 ignore_missing_imports = true
 
 [tool.pytest.ini_options]
-minversion = "6.0"
-addopts = "-ra -q --strict-markers"
-testpaths = [
-    "tests",
-]
+minversion = "8.0"
+addopts = "-ra --strict-markers"
+testpaths = ["tests"]
 asyncio_mode = "auto"
 asyncio_default_fixture_loop_scope = "function"
+markers = [
+    "integration: tests that hit the real YÖK Atlas API (opt-in)",
+]
 
 [tool.coverage.run]
 source = ["yokatlas_py"]
@@ -100,15 +69,8 @@ source = ["yokatlas_py"]
 [tool.coverage.report]
 exclude_lines = [
     "pragma: no cover",
-    "def __repr__",
-    "if self.debug:",
-    "if settings.DEBUG",
-    "raise AssertionError",
     "raise NotImplementedError",
-    "if 0:",
     "if __name__ == .__main__.:",
-    "class .*\\bProtocol\\):",
-    "@\\(abc\\.\\)?abstractmethod",
 ]
 
 [dependency-groups]
