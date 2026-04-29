@@ -87,9 +87,13 @@ from yokatlas_py import Settings, YokAtlasClient
 client = YokAtlasClient(settings=Settings(timeout=60.0, lookup_cache_ttl=600))
 ```
 
-## Limitation
+## Limitation — detailed Atlas data is gone
 
-The new API drops the per-program detail breakdowns that v0.x exposed (gender distribution, high school field/group, placed-by-city, preferred universities/programs, academic staff title distribution, transfers, graduation year, etc. — ~25 sub-categories). v0.6.0 only returns what the official API provides.
+> 🛑 **Detailed Atlas breakdowns (gender distribution, high-school field/group, placed-by-city, preferred universities/programs, academic staff title distribution, transfers, graduation-year distribution, year-by-year KPSS, etc. — ~25 sub-categories) are NOT in v0.6.0.**
+>
+> This is **YÖK Atlas's** decision, not the library's: with the late-2025 SPA migration these pages were removed from the site entirely. The frontend no longer renders them and there is no backend endpoint left to parse.
+>
+> If YÖK Atlas brings these data back (as new endpoints or as an expanded `search` response), we will add support. For now v0.6.0 returns only what the official API exposes — **quota/placement, academic staff counts, KPSS, min score, success rank** (4 years per program).
 
 ## Development
 

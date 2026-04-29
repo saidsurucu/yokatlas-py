@@ -129,9 +129,13 @@ client = YokAtlasClient(settings=settings)
 | `YOKATLAS_MAX_RETRIES` | `3` | HTTP retry sayısı |
 | `YOKATLAS_LOOKUP_CACHE_TTL` | `3600` | Üniversite/program/il cache TTL (sn) |
 
-## Önemli kısıt
+## Önemli kısıt — detaylı Atlas verileri artık yok
 
-YÖK Atlas yeni API'sinde **alt-kategori detayları kaldırıldı**: cinsiyet/lise alanı/yerleşen il dağılımı, tercih edilen üniversiteler/programlar, akademisyen ünvan dağılımı, yatay geçiş, mezuniyet yılı dağılımı vb. v0.x'te dönen ~25 alt kategori artık API'de yok. v0.6.0 sadece resmî API'nin sunduğunu döner.
+> 🛑 **Detaylı atlas verileri (cinsiyet/lise alanı/yerleşen il dağılımı, tercih edilen üniversiteler/programlar, akademisyen ünvan dağılımı, yatay geçiş, mezuniyet yılı dağılımı, KPSS yıllara göre, vb. ~25 alt kategori) v0.6.0'da YOK.**
+>
+> Bu, kütüphanenin değil **YÖK Atlas'ın** kararı: 2025 sonu SPA geçişiyle birlikte bu sayfalar siteden tamamen kaldırıldı, frontend bile artık bunları render etmiyor ve geriye parse edilebilecek bir endpoint kalmadı.
+>
+> YÖK Atlas bu verileri ileride geri getirirse (yeni endpoint'ler veya genişletilmiş `search` response'u olarak) kütüphaneye ekleyeceğiz. Şimdilik v0.6.0 sadece resmî API'nin sunduğu **kontenjan/yerleşen, akademik kadro, KPSS, taban puan, başarı sırası** alanlarını (4 yıllık) döner.
 
 ## Geliştirme
 
