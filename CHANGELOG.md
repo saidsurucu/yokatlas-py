@@ -4,7 +4,7 @@
 
 **BREAKING — Major rewrite.**
 
-YÖK Atlas migrated to a React SPA in late 2025; the legacy HTML-scraping endpoints (`/lisans/{yil}/{kod}.php`, `/onlisans/{yil}/{kod}.php`, `/lisans-tercih-sihirbazi.php`, `/server_side/server_processing-atlas2016-TS-{t3,t4}.php`) now serve a 926-byte SPA shell. v0.x is broken end-to-end. v0.6.0 targets the new official JSON API (`/api/tercih-kilavuz/*`).
+YÖK Atlas migrated to a React SPA in April 2026; the legacy HTML-scraping endpoints (`/lisans/{yil}/{kod}.php`, `/onlisans/{yil}/{kod}.php`, `/lisans-tercih-sihirbazi.php`, `/server_side/server_processing-atlas2016-TS-{t3,t4}.php`) now serve a 926-byte SPA shell. v0.x is broken end-to-end. v0.6.0 targets the new official JSON API (`/api/tercih-kilavuz/*`).
 
 ### Added
 

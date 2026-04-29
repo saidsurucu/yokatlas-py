@@ -2,7 +2,7 @@
 
 ## Neden v0.6.0?
 
-YÖK Atlas (`https://yokatlas.yok.gov.tr`) 2025 sonunda tamamen React tabanlı bir SPA'ya geçti. Eski PHP HTML endpoint'leri (`/lisans/{yil}/{kod}.php`, `/onlisans/{yil}/{kod}.php`, `/lisans-tercih-sihirbazi.php`, `/server_side/server_processing-atlas2016-TS-t4.php` vb.) artık tek bir boş SPA shell'i döndürüyor — yani v0.x kütüphanesindeki tüm dört ana sınıf ve 60+ HTML fetcher modülü çalışmıyor.
+YÖK Atlas (`https://yokatlas.yok.gov.tr`) Nisan 2026'da tamamen React tabanlı bir SPA'ya geçti. Eski PHP HTML endpoint'leri (`/lisans/{yil}/{kod}.php`, `/onlisans/{yil}/{kod}.php`, `/lisans-tercih-sihirbazi.php`, `/server_side/server_processing-atlas2016-TS-t4.php` vb.) artık tek bir boş SPA shell'i döndürüyor — yani v0.x kütüphanesindeki tüm dört ana sınıf ve 60+ HTML fetcher modülü çalışmıyor.
 
 v0.6.0 yeni resmi JSON API'ye karşı sıfırdan yazıldı (`/api/tercih-kilavuz/*`).
 

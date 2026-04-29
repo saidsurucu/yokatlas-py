@@ -8,7 +8,7 @@ A modern, type-safe Python client for the YÖK Atlas tercih kılavuzu JSON API.
 
 [Türkçe README](README.md) · [API Reference](API.md) · [Migration Guide](MIGRATION.md)
 
-> ⚠️ **v0.6.0 is a major rewrite.** YÖK Atlas migrated to a React SPA in 2025 and the legacy HTML-scraping endpoints were retired. v0.6.0 targets the new JSON API. v0.x users should consult [MIGRATION.md](MIGRATION.md).
+> ⚠️ **v0.6.0 is a major rewrite.** YÖK Atlas migrated to a React SPA in April 2026 and the legacy HTML-scraping endpoints were retired. v0.6.0 targets the new JSON API. v0.x users should consult [MIGRATION.md](MIGRATION.md).
 
 ## Features
 
@@ -91,7 +91,7 @@ client = YokAtlasClient(settings=Settings(timeout=60.0, lookup_cache_ttl=600))
 
 > 🛑 **Detailed Atlas breakdowns (gender distribution, high-school field/group, placed-by-city, preferred universities/programs, academic staff title distribution, transfers, graduation-year distribution, year-by-year KPSS, etc. — ~25 sub-categories) are NOT in v0.6.0.**
 >
-> This is **YÖK Atlas's** decision, not the library's: with the late-2025 SPA migration these pages were removed from the site entirely. The frontend no longer renders them and there is no backend endpoint left to parse.
+> This is **YÖK Atlas's** decision, not the library's: with the April-2026 SPA migration these pages were removed from the site entirely. The frontend no longer renders them and there is no backend endpoint left to parse.
 >
 > If YÖK Atlas brings these data back (as new endpoints or as an expanded `search` response), we will add support. For now v0.6.0 returns only what the official API exposes — **quota/placement, academic staff counts, KPSS, min score, success rank** (4 years per program).
 

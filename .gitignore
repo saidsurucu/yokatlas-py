@@ -167,6 +167,6 @@ cython_debug/
 test.py
 CLAUDE.md
 
-# Test files
-test_*.py
-*_test.py
+# Test files (only at repo root — tests/ directory is committed)
+/test_*.py
+/*_test.py

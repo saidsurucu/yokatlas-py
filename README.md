@@ -8,7 +8,7 @@ YÖK Atlas tercih kılavuzu JSON API'si için modern, tip güvenli Python istemc
 
 [English README](README_EN.md) · [API Referansı](API.md) · [Migration Rehberi](MIGRATION.md)
 
-> ⚠️ **v0.6.0 büyük değişiklik içerir.** YÖK Atlas 2025'te React tabanlı SPA'ya geçti ve eski HTML scraping endpoint'leri kapandı. v0.6.0, yeni JSON API'ye karşı sıfırdan yazıldı. v0.x kullanıcıları için [MIGRATION.md](MIGRATION.md) dosyasına bakın.
+> ⚠️ **v0.6.0 büyük değişiklik içerir.** YÖK Atlas Nisan 2026'da React tabanlı SPA'ya geçti ve eski HTML scraping endpoint'leri kapandı. v0.6.0, yeni JSON API'ye karşı sıfırdan yazıldı. v0.x kullanıcıları için [MIGRATION.md](MIGRATION.md) dosyasına bakın.
 
 ## Özellikler
 
@@ -133,7 +133,7 @@ client = YokAtlasClient(settings=settings)
 
 > 🛑 **Detaylı atlas verileri (cinsiyet/lise alanı/yerleşen il dağılımı, tercih edilen üniversiteler/programlar, akademisyen ünvan dağılımı, yatay geçiş, mezuniyet yılı dağılımı, KPSS yıllara göre, vb. ~25 alt kategori) v0.6.0'da YOK.**
 >
-> Bu, kütüphanenin değil **YÖK Atlas'ın** kararı: 2025 sonu SPA geçişiyle birlikte bu sayfalar siteden tamamen kaldırıldı, frontend bile artık bunları render etmiyor ve geriye parse edilebilecek bir endpoint kalmadı.
+> Bu, kütüphanenin değil **YÖK Atlas'ın** kararı: Nisan 2026 SPA geçişiyle birlikte bu sayfalar siteden tamamen kaldırıldı, frontend bile artık bunları render etmiyor ve geriye parse edilebilecek bir endpoint kalmadı.
 >
 > YÖK Atlas bu verileri ileride geri getirirse (yeni endpoint'ler veya genişletilmiş `search` response'u olarak) kütüphaneye ekleyeceğiz. Şimdilik v0.6.0 sadece resmî API'nin sunduğu **kontenjan/yerleşen, akademik kadro, KPSS, taban puan, başarı sırası** alanlarını (4 yıllık) döner.
 
