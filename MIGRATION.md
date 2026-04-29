@@ -1,14 +1,14 @@
-# v0.x → v1.0.0 Migration Rehberi
+# v0.x → v0.6.0 Migration Rehberi
 
-## Neden v1.0.0?
+## Neden v0.6.0?
 
 YÖK Atlas (`https://yokatlas.yok.gov.tr`) 2025 sonunda tamamen React tabanlı bir SPA'ya geçti. Eski PHP HTML endpoint'leri (`/lisans/{yil}/{kod}.php`, `/onlisans/{yil}/{kod}.php`, `/lisans-tercih-sihirbazi.php`, `/server_side/server_processing-atlas2016-TS-t4.php` vb.) artık tek bir boş SPA shell'i döndürüyor — yani v0.x kütüphanesindeki tüm dört ana sınıf ve 60+ HTML fetcher modülü çalışmıyor.
 
-v1.0.0 yeni resmi JSON API'ye karşı sıfırdan yazıldı (`/api/tercih-kilavuz/*`).
+v0.6.0 yeni resmi JSON API'ye karşı sıfırdan yazıldı (`/api/tercih-kilavuz/*`).
 
 ## Hızlı eşleme
 
-| v0.x | v1.0.0 |
+| v0.x | v0.6.0 |
 |---|---|
 | `YOKATLASLisansAtlasi(params).fetch_all_details()` | `YokAtlasClient().get_program(kilavuz_kodu)` |
 | `YOKATLASOnlisansAtlasi(params).fetch_all_details()` | `YokAtlasClient().get_program(kilavuz_kodu)` |
@@ -22,13 +22,13 @@ v1.0.0 yeni resmi JSON API'ye karşı sıfırdan yazıldı (`/api/tercih-kilavuz
 
 ### 1. `year` parametresi kalktı
 
-v0.x'te yıl bazlı endpoint vardı (lisans 2021–2024, önlisans 2023–2024). v1.0.0'da **her sonuçta 4 yıllık veri zaten gelir** — `current` (en güncel) + `history` (3 önceki yıl).
+v0.x'te yıl bazlı endpoint vardı (lisans 2021–2024, önlisans 2023–2024). v0.6.0'da **her sonuçta 4 yıllık veri zaten gelir** — `current` (en güncel) + `history` (3 önceki yıl).
 
 ```python
 # v0.x
 atlas = YOKATLASLisansAtlasi({"yop_kodu": "...", "year": 2024})
 
-# v1.0.0
+# v0.6.0
 prog = client.get_program(102210277)
 for stats in prog.all_years:
     print(stats.year, stats.min_puan, stats.basari_sirasi)
@@ -57,7 +57,7 @@ Yeni API bunları **sunmuyor**, alternatif yok:
 - `yerlesen_son_kisi_bilgileri`, `yerlesen_ortalama_netler`, `yerlesen_puan_bilgileri`, `yerlesen_basari_siralari`
 - `taban_puan_ve_basari_sirasi_istatistikleri` (sadece `current.min_puan` + `current.basari_sirasi` ve 3 yıllık `history` mevcut)
 
-v1.0.0 sadece resmi JSON API'nin sunduğu 61 alanı döner: kontenjan/yerleşen/akademik kadro/KPSS/taban puan/başarı sırası — her biri 4 yıl için.
+v0.6.0 sadece resmi JSON API'nin sunduğu 61 alanı döner: kontenjan/yerleşen/akademik kadro/KPSS/taban puan/başarı sırası — her biri 4 yıl için.
 
 ### 4. Form verisi sabit dosyaları silindi
 
@@ -75,7 +75,7 @@ search_lisans_programs({
     "program": "bilgisayar",
 })
 
-# v1.0.0
+# v0.6.0
 client.search(SearchFilters(
     puan_turu="SAY",       # büyük harf — "SAY"/"SÖZ"/"EA"/"DİL"/"TYT"
     universite="boğaziçi", # akıllı (fuzzy) — opsiyonel
@@ -114,7 +114,7 @@ results = search_lisans_programs({
 for r in results:
     print(r["universite"], r["program"], r["taban"])
 
-# v1.0.0
+# v0.6.0
 from yokatlas_py import YokAtlasClient, SearchFilters
 
 with YokAtlasClient() as client:
@@ -139,7 +139,7 @@ detail = asyncio.run(atlas.fetch_all_details())
 # detail["girdi_gostergeleri"]["genel_bilgiler"]...
 # detail["surec_ve_cikti_gostergeleri"]["cinsiyet_dagilimi"]  # ARTIK YOK
 
-# v1.0.0
+# v0.6.0
 from yokatlas_py import YokAtlasClient
 
 with YokAtlasClient() as client:
@@ -162,7 +162,7 @@ async def f():
     return await atlas.fetch_all_details()
 asyncio.run(f())
 
-# v1.0.0
+# v0.6.0
 import asyncio
 from yokatlas_py import AsyncYokAtlasClient, SearchFilters
 async def f():

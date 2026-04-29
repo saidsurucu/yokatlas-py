@@ -1,6 +1,6 @@
 # yokatlas-py API Referansı
 
-`yokatlas-py` v1.0.0, YÖK Atlas tercih kılavuzu JSON API'si üzerine ince bir tip-güvenli istemcidir. Bu belge tüm public sınıfları, fonksiyonları ve modelleri kapsar.
+`yokatlas-py` v0.6.0, YÖK Atlas tercih kılavuzu JSON API'si üzerine ince bir tip-güvenli istemcidir. Bu belge tüm public sınıfları, fonksiyonları ve modelleri kapsar.
 
 ## İçindekiler
 
@@ -174,7 +174,7 @@ from yokatlas_py import Settings
 | `timeout` | `30.0` | `YOKATLAS_TIMEOUT` |
 | `verify_ssl` | `true` | `YOKATLAS_VERIFY_SSL` |
 | `max_retries` | `3` | `YOKATLAS_MAX_RETRIES` |
-| `user_agent` | `yokatlas-py/1.0` | `YOKATLAS_USER_AGENT` |
+| `user_agent` | `yokatlas-py/0.6` | `YOKATLAS_USER_AGENT` |
 | `lookup_cache_ttl` | `3600` (sn) | `YOKATLAS_LOOKUP_CACHE_TTL` |
 
 `settings` adında bir process-wide singleton da export edilir.

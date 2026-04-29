@@ -24,7 +24,7 @@ class Settings(BaseSettings):
     verify_ssl: bool = Field(default=True, description="Verify TLS certificates.")
     max_retries: int = Field(default=3, ge=0, le=10, description="HTTP transport retries.")
     user_agent: str = Field(
-        default="yokatlas-py/1.0",
+        default="yokatlas-py/0.6",
         description="User-Agent header.",
     )
     lookup_cache_ttl: int = Field(

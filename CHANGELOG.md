@@ -1,10 +1,10 @@
 # Changelog
 
-## 1.0.0
+## 0.6.0
 
 **BREAKING — Major rewrite.**
 
-YÖK Atlas migrated to a React SPA in late 2025; the legacy HTML-scraping endpoints (`/lisans/{yil}/{kod}.php`, `/onlisans/{yil}/{kod}.php`, `/lisans-tercih-sihirbazi.php`, `/server_side/server_processing-atlas2016-TS-{t3,t4}.php`) now serve a 926-byte SPA shell. v0.x is broken end-to-end. v1.0.0 targets the new official JSON API (`/api/tercih-kilavuz/*`).
+YÖK Atlas migrated to a React SPA in late 2025; the legacy HTML-scraping endpoints (`/lisans/{yil}/{kod}.php`, `/onlisans/{yil}/{kod}.php`, `/lisans-tercih-sihirbazi.php`, `/server_side/server_processing-atlas2016-TS-{t3,t4}.php`) now serve a 926-byte SPA shell. v0.x is broken end-to-end. v0.6.0 targets the new official JSON API (`/api/tercih-kilavuz/*`).
 
 ### Added
 
@@ -31,7 +31,7 @@ YÖK Atlas migrated to a React SPA in late 2025; the legacy HTML-scraping endpoi
 - TLS verification default flipped to `True` (set `YOKATLAS_VERIFY_SSL=false` to opt out).
 - `puan_turu` is now uppercase (`SAY` / `SÖZ` / `EA` / `DİL` / `TYT`).
 
-See `MIGRATION.md` for a full v0.x → v1.0.0 transition guide.
+See `MIGRATION.md` for a full v0.x → v0.6.0 transition guide.
 
 ## 0.5.x and earlier
 

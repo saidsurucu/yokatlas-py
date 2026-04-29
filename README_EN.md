@@ -8,7 +8,7 @@ A modern, type-safe Python client for the YÖK Atlas tercih kılavuzu JSON API.
 
 [Türkçe README](README.md) · [API Reference](API.md) · [Migration Guide](MIGRATION.md)
 
-> ⚠️ **v1.0.0 is a major rewrite.** YÖK Atlas migrated to a React SPA in 2025 and the legacy HTML-scraping endpoints were retired. v1.0.0 targets the new JSON API. v0.x users should consult [MIGRATION.md](MIGRATION.md).
+> ⚠️ **v0.6.0 is a major rewrite.** YÖK Atlas migrated to a React SPA in 2025 and the legacy HTML-scraping endpoints were retired. v0.6.0 targets the new JSON API. v0.x users should consult [MIGRATION.md](MIGRATION.md).
 
 ## Features
 
@@ -89,7 +89,7 @@ client = YokAtlasClient(settings=Settings(timeout=60.0, lookup_cache_ttl=600))
 
 ## Limitation
 
-The new API drops the per-program detail breakdowns that v0.x exposed (gender distribution, high school field/group, placed-by-city, preferred universities/programs, academic staff title distribution, transfers, graduation year, etc. — ~25 sub-categories). v1.0.0 only returns what the official API provides.
+The new API drops the per-program detail breakdowns that v0.x exposed (gender distribution, high school field/group, placed-by-city, preferred universities/programs, academic staff title distribution, transfers, graduation year, etc. — ~25 sub-categories). v0.6.0 only returns what the official API provides.
 
 ## Development
 

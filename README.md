@@ -8,7 +8,7 @@ YÖK Atlas tercih kılavuzu JSON API'si için modern, tip güvenli Python istemc
 
 [English README](README_EN.md) · [API Referansı](API.md) · [Migration Rehberi](MIGRATION.md)
 
-> ⚠️ **v1.0.0 büyük değişiklik içerir.** YÖK Atlas 2025'te React tabanlı SPA'ya geçti ve eski HTML scraping endpoint'leri kapandı. v1.0.0, yeni JSON API'ye karşı sıfırdan yazıldı. v0.x kullanıcıları için [MIGRATION.md](MIGRATION.md) dosyasına bakın.
+> ⚠️ **v0.6.0 büyük değişiklik içerir.** YÖK Atlas 2025'te React tabanlı SPA'ya geçti ve eski HTML scraping endpoint'leri kapandı. v0.6.0, yeni JSON API'ye karşı sıfırdan yazıldı. v0.x kullanıcıları için [MIGRATION.md](MIGRATION.md) dosyasına bakın.
 
 ## Özellikler
 
@@ -131,7 +131,7 @@ client = YokAtlasClient(settings=settings)
 
 ## Önemli kısıt
 
-YÖK Atlas yeni API'sinde **alt-kategori detayları kaldırıldı**: cinsiyet/lise alanı/yerleşen il dağılımı, tercih edilen üniversiteler/programlar, akademisyen ünvan dağılımı, yatay geçiş, mezuniyet yılı dağılımı vb. v0.x'te dönen ~25 alt kategori artık API'de yok. v1.0.0 sadece resmî API'nin sunduğunu döner.
+YÖK Atlas yeni API'sinde **alt-kategori detayları kaldırıldı**: cinsiyet/lise alanı/yerleşen il dağılımı, tercih edilen üniversiteler/programlar, akademisyen ünvan dağılımı, yatay geçiş, mezuniyet yılı dağılımı vb. v0.x'te dönen ~25 alt kategori artık API'de yok. v0.6.0 sadece resmî API'nin sunduğunu döner.
 
 ## Geliştirme
 
